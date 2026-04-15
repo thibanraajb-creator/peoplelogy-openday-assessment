@@ -5,6 +5,9 @@ import { CLUSTER_QUESTIONS, computeIndividualScores } from '../data/individualQu
 import { supabase, SESSION_CODE } from '../lib/supabase'
 import Logo from '../components/Logo'
 
+// Target table: openday_individual_capability
+const INDIVIDUAL_TABLE = 'openday_individual_capability'
+
 function SingleSelect({ options, selected, onSelect }) {
   return (
     <div className="space-y-3">
@@ -96,6 +99,7 @@ export default function SurveyIndividual() {
 
   const [currentQ, setCurrentQ] = useState(0)
   const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState(null)
 
   useEffect(() => {
     if (!intake.firstName) navigate('/')
@@ -114,6 +118,7 @@ export default function SurveyIndividual() {
 
   const handleSingleSelect = (index) => {
     updateIndividualResponse(currentQ, index)
+    setSaveError(null)
   }
 
   const handleMultiToggle = (index) => {
@@ -122,16 +127,17 @@ export default function SurveyIndividual() {
       updateIndividualResponse(currentQ, current.filter(i => i !== index))
     } else {
       if (question.maxSelect && current.length >= question.maxSelect) {
-        // Replace first if at max
         updateIndividualResponse(currentQ, [...current.slice(1), index])
       } else {
         updateIndividualResponse(currentQ, [...current, index])
       }
     }
+    setSaveError(null)
   }
 
   const handleOpenText = (text) => {
     updateIndividualResponse(currentQ, text)
+    setSaveError(null)
   }
 
   const handleNext = async () => {
@@ -143,61 +149,94 @@ export default function SurveyIndividual() {
       return
     }
 
+    // Final question — compute scores and save to openday_individual_capability
     setSaving(true)
+    setSaveError(null)
+
     try {
+      // Compute dimension and capability scores from all 10 answers
       const scores = computeIndividualScores(individualResponses, cluster)
       setIndividualScores(scores)
 
-      // Build answer fields
+      // Build l2_q1 through l2_q10 answer text fields
       const answerFields = {}
       individualResponses.forEach((r, i) => {
+        const q = questions[i]
         if (r === null || r === undefined) {
           answerFields[`l2_q${i + 1}`] = null
         } else if (Array.isArray(r)) {
-          const q = questions[i]
+          // multi_select: store selected option texts joined
           const texts = r.map(idx => q.options?.[idx]?.text || String(idx))
           answerFields[`l2_q${i + 1}`] = texts.join(', ')
         } else if (typeof r === 'number') {
-          const q = questions[i]
+          // single_select: store the selected option text
           answerFields[`l2_q${i + 1}`] = q.options?.[r]?.text || String(r)
         } else {
+          // open_text: store raw string
           answerFields[`l2_q${i + 1}`] = String(r)
         }
       })
 
+      // Build the full payload for openday_individual_capability
       const payload = {
+        // For full path: links to the org response row via UUID
+        // For individual-only path: null (no org response exists)
         response_id: orgResponseId || null,
+
+        // Participant details from intake form
         first_name: intake.firstName,
         organisation: intake.organisation,
         industry: intake.industry,
         role_level: intake.roleLevel,
-        cluster,
-        session_code: SESSION_CODE,
+        cluster,                        // A | B | C | D | E
+
+        // Session metadata
+        session_code: SESSION_CODE,     // 'JBOPEN2026'
         cycle: 1,
+
+        // Dimension scores (1–4 scale averages)
         d1_awareness_score: scores.dimensionAverages.D1,
         d2_tool_use_score: scores.dimensionAverages.D2,
         d3_prompt_ability_score: scores.dimensionAverages.D3,
         d4_opportunity_score: scores.dimensionAverages.D4,
         d5_workflow_score: scores.dimensionAverages.D5,
+
+        // Overall capability score (1–4 scale average)
         overall_capability_score: scores.overallAverage,
+
+        // Derived labels and learning focus
         capability_label: scores.capabilityLabel,
         primary_learning_focus: scores.primaryLearningFocus,
         secondary_learning_focus: scores.secondaryLearningFocus,
         is_champion: scores.isChampion,
+
+        // Raw answer text for all 10 questions (l2_q1 – l2_q10)
         ...answerFields,
       }
 
+      // INSERT into openday_individual_capability (NOT openday_sessions)
       const { data, error } = await supabase
-        .from('openday_individual_capability')
+        .from(INDIVIDUAL_TABLE)
         .insert(payload)
         .select('id')
         .single()
 
-      if (!error && data) {
+      if (error) {
+        // Surface the Supabase error so it can be diagnosed
+        console.error('[SurveyIndividual] Supabase insert error:', error)
+        setSaveError(`Could not save your responses: ${error.message}. Your results will still be shown, but may not be recorded.`)
+        // Still navigate so the user sees their results — scores are held in React state
+        navigate('/results')
+        return
+      }
+
+      if (data?.id) {
         setIndividualResponseId(data.id)
+        console.log('[SurveyIndividual] Saved to', INDIVIDUAL_TABLE, 'with id:', data.id, '| response_id (org link):', payload.response_id)
       }
     } catch (err) {
-      console.error('Error saving individual responses:', err)
+      console.error('[SurveyIndividual] Unexpected error:', err)
+      setSaveError('An unexpected error occurred. Your results will still be shown.')
     } finally {
       setSaving(false)
     }
@@ -229,12 +268,12 @@ export default function SurveyIndividual() {
             <span className="text-xs font-semibold text-[#00ADA9]">
               Question {currentQ + 1} of {questions.length}
             </span>
-            <span className="text-xs text-gray-500">{Math.round(((currentQ) / questions.length) * 100)}% complete</span>
+            <span className="text-xs text-gray-500">{Math.round((currentQ / questions.length) * 100)}% complete</span>
           </div>
           <div className="w-full bg-gray-100 rounded-full h-2">
             <div
               className="bg-[#00ADA9] h-2 rounded-full transition-all duration-500"
-              style={{ width: `${((currentQ) / questions.length) * 100}%` }}
+              style={{ width: `${(currentQ / questions.length) * 100}%` }}
             />
           </div>
         </div>
@@ -242,12 +281,22 @@ export default function SurveyIndividual() {
 
       {/* Content */}
       <div className="max-w-2xl mx-auto px-6 py-8 fade-in">
-        {/* Question dimension badge */}
+        {/* Question badge */}
         <div className="mb-6">
           <span className="inline-flex items-center gap-1.5 bg-[#E6FAF9] text-[#00ADA9] text-xs font-bold px-3 py-1.5 rounded-full">
             Q{currentQ + 1} of {questions.length}
           </span>
         </div>
+
+        {/* Save error banner */}
+        {saveError && (
+          <div className="mb-4 bg-red-50 border border-red-200 rounded-xl px-4 py-3 flex items-start gap-3">
+            <svg className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p className="text-red-700 text-xs">{saveError}</p>
+          </div>
+        )}
 
         {/* Question card */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6">

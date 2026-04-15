@@ -5,6 +5,9 @@ import { ORG_PILLARS, LIKERT_LABELS, computeOrgScores } from '../data/orgQuestio
 import { supabase, SESSION_CODE } from '../lib/supabase'
 import Logo from '../components/Logo'
 
+// Target table: openday_responses
+const ORG_TABLE = 'openday_responses'
+
 function LikertButton({ value, label, selected, onClick }) {
   return (
     <button
@@ -29,12 +32,10 @@ export default function SurveyOrg() {
 
   const [currentPillar, setCurrentPillar] = useState(0) // 0-indexed
   const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState(null)
 
-  // Redirect if no intake data
   useEffect(() => {
-    if (!intake.firstName) {
-      navigate('/')
-    }
+    if (!intake.firstName) navigate('/')
   }, [intake.firstName, navigate])
 
   const pillar = ORG_PILLARS[currentPillar]
@@ -42,11 +43,11 @@ export default function SurveyOrg() {
   const answers = orgResponses[pillarKey]
   const allAnswered = answers.every(a => a !== null)
   const answeredCount = answers.filter(a => a !== null).length
-
   const isLastPillar = currentPillar === ORG_PILLARS.length - 1
 
   const handleAnswer = (questionIndex, score) => {
     updateOrgResponses(pillar.id, questionIndex, score)
+    setSaveError(null)
   }
 
   const handleNext = async () => {
@@ -58,16 +59,16 @@ export default function SurveyOrg() {
       return
     }
 
-    // Last pillar — compute scores and save
+    // Final pillar — compute scores and save to openday_responses
     setSaving(true)
-    try {
-      // Build final responses including current pillar
-      const finalResponses = { ...orgResponses }
+    setSaveError(null)
 
+    try {
+      const finalResponses = { ...orgResponses }
       const scores = computeOrgScores(finalResponses)
       setOrgScores(scores)
 
-      // Build individual question fields
+      // Build p1_q1 through p5_q4 individual question score fields
       const questionFields = {}
       for (let p = 1; p <= 5; p++) {
         const pAnswers = finalResponses[`pillar${p}`]
@@ -76,36 +77,61 @@ export default function SurveyOrg() {
         })
       }
 
-      // Save to Supabase
+      // Build the full payload for openday_responses
       const payload = {
+        // Participant details from intake form
         first_name: intake.firstName,
         organisation: intake.organisation,
         industry: intake.industry,
         role_level: intake.roleLevel,
-        session_code: SESSION_CODE,
+
+        // Session metadata
+        session_code: SESSION_CODE,   // 'JBOPEN2026'
         cycle: 1,
+
+        // Pillar raw sums (each out of 20)
         pillar1_score: finalResponses.pillar1.reduce((a, b) => a + (b || 0), 0),
         pillar2_score: finalResponses.pillar2.reduce((a, b) => a + (b || 0), 0),
         pillar3_score: finalResponses.pillar3.reduce((a, b) => a + (b || 0), 0),
         pillar4_score: finalResponses.pillar4.reduce((a, b) => a + (b || 0), 0),
         pillar5_score: finalResponses.pillar5.reduce((a, b) => a + (b || 0), 0),
+
+        // Derived scores and labels
         overall_score: scores.overallPercentage,
         maturity_level: scores.maturityLevel,
         maturity_label: scores.maturityLabel,
+
+        // Individual question scores (p1_q1 – p5_q4)
         ...questionFields,
       }
 
+      // INSERT into openday_responses
       const { data, error } = await supabase
-        .from('openday_responses')
+        .from(ORG_TABLE)
         .insert(payload)
         .select('id')
         .single()
 
-      if (!error && data) {
+      if (error) {
+        console.error('[SurveyOrg] Supabase insert error:', error)
+        setSaveError(`Could not save your responses: ${error.message}. Your results will still be shown.`)
+        // Navigate anyway so user sees their results (scores are in React state)
+        if (path === 'full') {
+          navigate('/transition')
+        } else {
+          navigate('/results')
+        }
+        return
+      }
+
+      if (data?.id) {
+        // Store the UUID so SurveyIndividual can link to it via response_id (full path)
         setOrgResponseId(data.id)
+        console.log('[SurveyOrg] Saved to', ORG_TABLE, 'with id:', data.id)
       }
     } catch (err) {
-      console.error('Error saving org responses:', err)
+      console.error('[SurveyOrg] Unexpected error:', err)
+      setSaveError('An unexpected error occurred. Your results will still be shown.')
     } finally {
       setSaving(false)
     }
@@ -123,8 +149,6 @@ export default function SurveyOrg() {
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
-
-  const overallProgress = ((currentPillar) / ORG_PILLARS.length) * 100
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -153,17 +177,17 @@ export default function SurveyOrg() {
               style={{ width: `${((currentPillar * 4 + answeredCount) / 20) * 100}%` }}
             />
           </div>
-          {/* Pillar dots */}
+          {/* Pillar progress dots */}
           <div className="flex gap-1 mt-2 justify-center">
             {ORG_PILLARS.map((p, i) => (
               <div
                 key={p.id}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
+                className={`h-1.5 rounded-full transition-all duration-300 flex-1 ${
                   i < currentPillar
-                    ? 'bg-[#00ADA9] flex-1'
+                    ? 'bg-[#00ADA9]'
                     : i === currentPillar
-                    ? 'bg-[#00ADA9]/60 flex-1'
-                    : 'bg-gray-200 flex-1'
+                    ? 'bg-[#00ADA9]/60'
+                    : 'bg-gray-200'
                 }`}
               />
             ))}
@@ -184,6 +208,16 @@ export default function SurveyOrg() {
           <p className="text-gray-600 text-sm">{pillar.description}</p>
         </div>
 
+        {/* Save error banner */}
+        {saveError && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-xl px-4 py-3 flex items-start gap-3">
+            <svg className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p className="text-red-700 text-xs">{saveError}</p>
+          </div>
+        )}
+
         {/* Questions */}
         <div className="space-y-8">
           {pillar.questions.map((question, qi) => (
@@ -193,7 +227,6 @@ export default function SurveyOrg() {
                 {question}
               </p>
 
-              {/* Likert scale */}
               <div className="flex gap-2">
                 {LIKERT_LABELS.map(({ value, label }) => (
                   <LikertButton
@@ -206,7 +239,6 @@ export default function SurveyOrg() {
                 ))}
               </div>
 
-              {/* Labels below on mobile */}
               <div className="flex justify-between mt-2 px-1 sm:hidden">
                 <span className="text-xs text-gray-400">Not at all</span>
                 <span className="text-xs text-gray-400">Fully</span>
