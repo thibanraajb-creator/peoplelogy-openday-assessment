@@ -68,7 +68,7 @@ export default function SurveyOrg() {
       const scores = computeOrgScores(finalResponses)
       setOrgScores(scores)
 
-      // Build p1_q1 through p5_q4 individual question score fields
+      // Build p1_q1 through p5_q5 individual question score fields
       const questionFields = {}
       for (let p = 1; p <= 5; p++) {
         const pAnswers = finalResponses[`pillar${p}`]
@@ -89,7 +89,7 @@ export default function SurveyOrg() {
         session_code: SESSION_CODE,   // 'JBOPEN2026'
         cycle: 1,
 
-        // Pillar raw sums (each out of 20)
+        // Pillar raw sums (each out of 25)
         pillar1_score: finalResponses.pillar1.reduce((a, b) => a + (b || 0), 0),
         pillar2_score: finalResponses.pillar2.reduce((a, b) => a + (b || 0), 0),
         pillar3_score: finalResponses.pillar3.reduce((a, b) => a + (b || 0), 0),
@@ -101,7 +101,7 @@ export default function SurveyOrg() {
         maturity_level: scores.maturityLevel,
         maturity_label: scores.maturityLabel,
 
-        // Individual question scores (p1_q1 – p5_q4)
+        // Individual question scores (p1_q1 – p5_q5)
         ...questionFields,
       }
 

@@ -50,7 +50,7 @@ export default function Dashboard() {
   const pillarAvgs = [1, 2, 3, 4, 5].map(p => {
     const vals = orgData.map(d => d[`pillar${p}_score`] || 0)
     const avg = vals.length > 0 ? vals.reduce((a, b) => a + b, 0) / vals.length : 0
-    const pct = Math.round((avg / 20) * 100)
+    const pct = Math.round((avg / 25) * 100)
     return { name: ['Strategy', 'Data & Tech', 'People', 'Processes', 'Governance'][p - 1], score: pct }
   })
 

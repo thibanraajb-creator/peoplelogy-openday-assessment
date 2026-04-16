@@ -154,7 +154,7 @@ export default function SurveyIndividual() {
     setSaveError(null)
 
     try {
-      // Compute dimension and capability scores from all 10 answers
+      // Compute dimension and capability scores from all responses
       const scores = computeIndividualScores(individualResponses, cluster)
       setIndividualScores(scores)
 
@@ -210,7 +210,7 @@ export default function SurveyIndividual() {
         secondary_learning_focus: scores.secondaryLearningFocus,
         is_champion: scores.isChampion,
 
-        // Raw answer text for all 10 questions (l2_q1 – l2_q10)
+        // Raw answer text for all 15 questions (l2_q1 – l2_q15)
         ...answerFields,
       }
 

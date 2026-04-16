@@ -33,8 +33,8 @@ export function AssessmentProvider({ children }) {
     // Layer 1 computed scores
     orgScores: null,
 
-    // Layer 2 individual responses
-    individualResponses: Array(10).fill(null),
+    // Layer 2 individual responses (15 per cluster)
+    individualResponses: Array(15).fill(null),
 
     // Layer 2 computed scores
     individualScores: null,

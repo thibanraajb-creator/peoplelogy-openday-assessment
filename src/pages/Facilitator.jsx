@@ -80,7 +80,7 @@ export default function Facilitator() {
   const pillarTotals = [1, 2, 3, 4, 5].map(p => {
     const vals = orgData.map(d => d[`pillar${p}_score`] || 0)
     const avg = vals.length > 0 ? (vals.reduce((a, b) => a + b, 0) / vals.length) : 0
-    return { pillar: p, name: PILLAR_NAMES[p - 1], avgPct: Math.round((avg / 20) * 100) }
+    return { pillar: p, name: PILLAR_NAMES[p - 1], avgPct: Math.round((avg / 25) * 100) }
   })
   const weakest3 = [...pillarTotals].sort((a, b) => a.avgPct - b.avgPct).slice(0, 3)
 
