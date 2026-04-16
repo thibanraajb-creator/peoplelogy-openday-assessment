@@ -65,3 +65,7 @@
 .fade-in {
   animation: fadeIn 0.4s ease-out;
 }
+
+/* Hide neural network SVG on mobile */
+.hidden-mobile { display: flex; }
+@media (max-width: 768px) { .hidden-mobile { display: none; } }

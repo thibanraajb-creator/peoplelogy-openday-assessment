@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom'
 import Logo from '../components/Logo'
-import NeuralNetSVG from '../components/NeuralNetSVG'
 
 function PathCard({ icon, title, description, time, buttonText, badge, onClick }) {
   return (
@@ -51,44 +50,118 @@ export default function Landing() {
       </nav>
 
       {/* Hero */}
-      <section className="max-w-6xl mx-auto px-6 pt-12 pb-10">
-        <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+      <div style={{display: 'flex', alignItems: 'center', minHeight: '500px', padding: '40px 32px', background: '#1B3A5C'}}>
 
-          {/* Left column — text (60%) */}
-          <div className="flex-1 md:basis-3/5 text-center md:text-left">
-            <div className="inline-flex items-center gap-2 bg-[#00ADA9]/20 border border-[#00ADA9]/30 text-[#00ADA9] text-xs font-bold px-4 py-2 rounded-full uppercase tracking-widest mb-8">
-              <span className="w-1.5 h-1.5 bg-[#00ADA9] rounded-full"></span>
-              Powered by PEOPLElogy
-            </div>
-
-            <h1 className="text-5xl md:text-6xl font-extrabold text-white leading-tight mb-6">
-              AI Readiness<br />
-              <span className="text-[#00ADA9]">Assessment</span>
-            </h1>
-
-            <p className="text-white/70 text-lg mb-8 leading-relaxed">
-              Discover where you and your organisation stand on AI adoption.<br className="hidden md:block" />
-              Get your personal report instantly.
-            </p>
-
-            <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white/90 text-sm font-medium px-5 py-2.5 rounded-full">
-              <svg className="w-4 h-4 text-[#00ADA9]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              Open Day JB · 5 May 2026 · Johor Bahru
-            </div>
+        {/* Left column - text */}
+        <div style={{flex: '0 0 55%', paddingRight: '40px'}}>
+          <div className="inline-flex items-center gap-2 bg-[#00ADA9]/20 border border-[#00ADA9]/30 text-[#00ADA9] text-xs font-bold px-4 py-2 rounded-full uppercase tracking-widest mb-8">
+            <span className="w-1.5 h-1.5 bg-[#00ADA9] rounded-full"></span>
+            Powered by PEOPLElogy
           </div>
 
-          {/* Right column — neural net SVG (40%), hidden below md (768px) */}
-          <div className="hidden md:flex md:basis-2/5 items-center justify-center shrink-0">
-            <div className="w-full max-w-[300px]">
-              <NeuralNetSVG />
-            </div>
-          </div>
+          <h1 className="text-5xl md:text-6xl font-extrabold text-white leading-tight mb-6">
+            AI Readiness<br />
+            <span className="text-[#00ADA9]">Assessment</span>
+          </h1>
 
+          <p className="text-white/70 text-lg mb-8 leading-relaxed">
+            Discover where you and your organisation stand on AI adoption.<br />
+            Get your personal report instantly.
+          </p>
+
+          <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white/90 text-sm font-medium px-5 py-2.5 rounded-full">
+            <svg className="w-4 h-4 text-[#00ADA9]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            Open Day JB · 5 May 2026 · Johor Bahru
+          </div>
         </div>
-      </section>
+
+        {/* Right column - neural network */}
+        <div style={{flex: '0 0 45%', display: 'flex', justifyContent: 'center', alignItems: 'center'}} className="hidden-mobile">
+          <svg viewBox="0 0 400 500" width="400" height="500" xmlns="http://www.w3.org/2000/svg">
+            <style>{`
+              @keyframes pulse { 0%{transform:scale(1)} 100%{transform:scale(1.15)} }
+              @keyframes glow { 0%{opacity:0.2} 100%{opacity:0.6} }
+              @keyframes float1 { 0%{transform:translateY(0)} 100%{transform:translateY(-500px)} }
+              @keyframes travel { 0%{stroke-dashoffset:200} 100%{stroke-dashoffset:0} }
+            `}</style>
+
+            {/* Background connections */}
+            <line x1="200" y1="250" x2="80" y2="120" stroke="rgba(0,173,169,0.3)" strokeWidth="1"/>
+            <line x1="200" y1="250" x2="320" y2="100" stroke="rgba(0,173,169,0.3)" strokeWidth="1"/>
+            <line x1="200" y1="250" x2="350" y2="300" stroke="rgba(0,173,169,0.3)" strokeWidth="1"/>
+            <line x1="200" y1="250" x2="80" y2="380" stroke="rgba(0,173,169,0.3)" strokeWidth="1"/>
+            <line x1="200" y1="250" x2="200" y2="80" stroke="rgba(0,173,169,0.3)" strokeWidth="1"/>
+            <line x1="80" y1="120" x2="200" y2="80" stroke="rgba(0,173,169,0.2)" strokeWidth="1"/>
+            <line x1="320" y1="100" x2="200" y2="80" stroke="rgba(0,173,169,0.2)" strokeWidth="1"/>
+            <line x1="350" y1="300" x2="320" y2="400" stroke="rgba(0,173,169,0.2)" strokeWidth="1"/>
+            <line x1="80" y1="380" x2="150" y2="450" stroke="rgba(0,173,169,0.2)" strokeWidth="1"/>
+            <line x1="80" y1="120" x2="50" y2="250" stroke="rgba(0,173,169,0.2)" strokeWidth="1"/>
+            <line x1="50" y1="250" x2="80" y2="380" stroke="rgba(0,173,169,0.2)" strokeWidth="1"/>
+            <line x1="320" y1="100" x2="370" y2="180" stroke="rgba(0,173,169,0.2)" strokeWidth="1"/>
+            <line x1="370" y1="180" x2="350" y2="300" stroke="rgba(0,173,169,0.2)" strokeWidth="1"/>
+
+            {/* Highlighted connections from hub */}
+            <line x1="200" y1="250" x2="80" y2="120" stroke="rgba(0,173,169,0.9)" strokeWidth="1.5" strokeDasharray="8 4" style={{animation:'travel 3s linear infinite'}}/>
+            <line x1="200" y1="250" x2="320" y2="100" stroke="rgba(0,173,169,0.9)" strokeWidth="1.5" strokeDasharray="8 4" style={{animation:'travel 4s linear infinite'}}/>
+            <line x1="200" y1="250" x2="350" y2="300" stroke="rgba(0,173,169,0.9)" strokeWidth="1.5" strokeDasharray="8 4" style={{animation:'travel 2.5s linear infinite'}}/>
+            <line x1="200" y1="250" x2="80" y2="380" stroke="rgba(0,173,169,0.9)" strokeWidth="1.5" strokeDasharray="8 4" style={{animation:'travel 3.5s linear infinite'}}/>
+            <line x1="200" y1="250" x2="200" y2="80" stroke="rgba(0,173,169,0.9)" strokeWidth="1.5" strokeDasharray="8 4" style={{animation:'travel 2s linear infinite'}}/>
+
+            {/* Central hub glow rings */}
+            <circle cx="200" cy="250" r="42" fill="none" stroke="rgba(0,173,169,0.1)" strokeWidth="1" style={{animation:'glow 2s ease-in-out infinite alternate'}}/>
+            <circle cx="200" cy="250" r="32" fill="none" stroke="rgba(0,173,169,0.2)" strokeWidth="1" style={{animation:'glow 2s ease-in-out infinite alternate', animationDelay:'0.3s'}}/>
+            <circle cx="200" cy="250" r="24" fill="none" stroke="rgba(0,173,169,0.4)" strokeWidth="1" style={{animation:'glow 2s ease-in-out infinite alternate', animationDelay:'0.6s'}}/>
+
+            {/* Central hub */}
+            <circle cx="200" cy="250" r="18" fill="#00ADA9" style={{animation:'pulse 2s ease-in-out infinite alternate'}}/>
+
+            {/* Outer nodes with glow */}
+            <circle cx="80" cy="120" r="14" fill="rgba(0,173,169,0.15)"/>
+            <circle cx="80" cy="120" r="10" fill="#00ADA9" style={{animation:'pulse 1.5s ease-in-out infinite alternate', animationDelay:'0.2s'}}/>
+
+            <circle cx="320" cy="100" r="14" fill="rgba(0,173,169,0.15)"/>
+            <circle cx="320" cy="100" r="10" fill="#5DCAA5" style={{animation:'pulse 1.5s ease-in-out infinite alternate', animationDelay:'0.8s'}}/>
+
+            <circle cx="350" cy="300" r="14" fill="rgba(0,173,169,0.15)"/>
+            <circle cx="350" cy="300" r="10" fill="#00ADA9" style={{animation:'pulse 1.5s ease-in-out infinite alternate', animationDelay:'1.4s'}}/>
+
+            <circle cx="80" cy="380" r="14" fill="rgba(0,173,169,0.15)"/>
+            <circle cx="80" cy="380" r="10" fill="#5DCAA5" style={{animation:'pulse 1.5s ease-in-out infinite alternate', animationDelay:'0.5s'}}/>
+
+            <circle cx="200" cy="80" r="14" fill="rgba(0,173,169,0.15)"/>
+            <circle cx="200" cy="80" r="10" fill="#00ADA9" style={{animation:'pulse 1.5s ease-in-out infinite alternate', animationDelay:'1.1s'}}/>
+
+            {/* Small nodes */}
+            <circle cx="50" cy="250" r="6" fill="rgba(255,255,255,0.7)" style={{animation:'pulse 2s ease-in-out infinite alternate', animationDelay:'0.3s'}}/>
+            <circle cx="370" cy="180" r="6" fill="rgba(255,255,255,0.7)" style={{animation:'pulse 2s ease-in-out infinite alternate', animationDelay:'1.2s'}}/>
+            <circle cx="320" cy="400" r="6" fill="rgba(255,255,255,0.7)" style={{animation:'pulse 2s ease-in-out infinite alternate', animationDelay:'0.7s'}}/>
+            <circle cx="150" cy="450" r="6" fill="rgba(255,255,255,0.7)" style={{animation:'pulse 2s ease-in-out infinite alternate', animationDelay:'1.8s'}}/>
+            <circle cx="130" cy="200" r="5" fill="rgba(93,202,165,0.8)" style={{animation:'pulse 2s ease-in-out infinite alternate', animationDelay:'0.9s'}}/>
+            <circle cx="280" cy="200" r="5" fill="rgba(93,202,165,0.8)" style={{animation:'pulse 2s ease-in-out infinite alternate', animationDelay:'1.5s'}}/>
+            <circle cx="260" cy="350" r="5" fill="rgba(93,202,165,0.8)" style={{animation:'pulse 2s ease-in-out infinite alternate', animationDelay:'0.4s'}}/>
+            <circle cx="140" cy="330" r="5" fill="rgba(93,202,165,0.8)" style={{animation:'pulse 2s ease-in-out infinite alternate', animationDelay:'2.1s'}}/>
+
+            {/* Floating particles */}
+            <circle cx="100" cy="400" r="2" fill="rgba(255,255,255,0.4)" style={{animation:'float1 8s linear infinite'}}/>
+            <circle cx="160" cy="350" r="2" fill="rgba(255,255,255,0.4)" style={{animation:'float1 10s linear infinite', animationDelay:'2s'}}/>
+            <circle cx="240" cy="420" r="2" fill="rgba(255,255,255,0.4)" style={{animation:'float1 7s linear infinite', animationDelay:'4s'}}/>
+            <circle cx="300" cy="380" r="2" fill="rgba(255,255,255,0.4)" style={{animation:'float1 9s linear infinite', animationDelay:'1s'}}/>
+            <circle cx="340" cy="460" r="2" fill="rgba(255,255,255,0.4)" style={{animation:'float1 11s linear infinite', animationDelay:'3s'}}/>
+            <circle cx="60" cy="300" r="2" fill="rgba(255,255,255,0.4)" style={{animation:'float1 6s linear infinite', animationDelay:'5s'}}/>
+
+            {/* Pillar labels */}
+            <text x="55" y="108" fontSize="9" fill="rgba(255,255,255,0.5)" textAnchor="middle">Strategy</text>
+            <text x="320" y="88" fontSize="9" fill="rgba(255,255,255,0.5)" textAnchor="middle">Data</text>
+            <text x="370" y="300" fontSize="9" fill="rgba(255,255,255,0.5)" textAnchor="middle">Process</text>
+            <text x="65" y="395" fontSize="9" fill="rgba(255,255,255,0.5)" textAnchor="middle">People</text>
+            <text x="200" y="68" fontSize="9" fill="rgba(255,255,255,0.5)" textAnchor="middle">Governance</text>
+          </svg>
+        </div>
+
+      </div>
 
       {/* Path Cards */}
       <section className="max-w-6xl mx-auto px-6 pb-16">
