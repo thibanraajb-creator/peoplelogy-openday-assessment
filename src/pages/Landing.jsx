@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import Logo from '../components/Logo'
+import NeuralNetSVG from '../components/NeuralNetSVG'
 
 function PathCard({ icon, title, description, time, buttonText, badge, onClick }) {
   return (
@@ -50,28 +51,42 @@ export default function Landing() {
       </nav>
 
       {/* Hero */}
-      <section className="max-w-6xl mx-auto px-6 pt-12 pb-16 text-center">
-        <div className="inline-flex items-center gap-2 bg-[#00ADA9]/20 border border-[#00ADA9]/30 text-[#00ADA9] text-xs font-bold px-4 py-2 rounded-full uppercase tracking-widest mb-8">
-          <span className="w-1.5 h-1.5 bg-[#00ADA9] rounded-full"></span>
-          Powered by PEOPLElogy
-        </div>
+      <section className="max-w-6xl mx-auto px-6 pt-12 pb-10">
+        <div className="grid lg:grid-cols-5 gap-8 lg:gap-4 items-center">
 
-        <h1 className="text-5xl md:text-6xl font-extrabold text-white leading-tight mb-6">
-          AI Readiness<br />
-          <span className="text-[#00ADA9]">Assessment</span>
-        </h1>
+          {/* Left column — text (60%) */}
+          <div className="lg:col-span-3 text-center lg:text-left">
+            <div className="inline-flex items-center gap-2 bg-[#00ADA9]/20 border border-[#00ADA9]/30 text-[#00ADA9] text-xs font-bold px-4 py-2 rounded-full uppercase tracking-widest mb-8">
+              <span className="w-1.5 h-1.5 bg-[#00ADA9] rounded-full"></span>
+              Powered by PEOPLElogy
+            </div>
 
-        <p className="text-white/70 text-lg max-w-2xl mx-auto mb-8 leading-relaxed">
-          Discover where you and your organisation stand on AI adoption.<br className="hidden md:block" />
-          Get your personal report instantly.
-        </p>
+            <h1 className="text-5xl md:text-6xl font-extrabold text-white leading-tight mb-6">
+              AI Readiness<br />
+              <span className="text-[#00ADA9]">Assessment</span>
+            </h1>
 
-        <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white/90 text-sm font-medium px-5 py-2.5 rounded-full">
-          <svg className="w-4 h-4 text-[#00ADA9]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-          Open Day JB · 5 May 2026 · Johor Bahru
+            <p className="text-white/70 text-lg mb-8 leading-relaxed">
+              Discover where you and your organisation stand on AI adoption.<br className="hidden lg:block" />
+              Get your personal report instantly.
+            </p>
+
+            <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white/90 text-sm font-medium px-5 py-2.5 rounded-full">
+              <svg className="w-4 h-4 text-[#00ADA9]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              Open Day JB · 5 May 2026 · Johor Bahru
+            </div>
+          </div>
+
+          {/* Right column — neural net SVG (40%), hidden on mobile */}
+          <div className="hidden lg:flex lg:col-span-2 items-center justify-center">
+            <div className="w-full max-w-[320px]">
+              <NeuralNetSVG />
+            </div>
+          </div>
+
         </div>
       </section>
 
