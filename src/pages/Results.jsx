@@ -80,54 +80,167 @@ function DimensionBar({ label, score, isLowest }) {
   )
 }
 
-function RecommendationCard({ title, body, cta = 'Talk to us', link = 'mailto:info@peoplelogy.com' }) {
+function RecommendationCard({ category, badgeColor, name, description }) {
   return (
-    <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-      <div className="flex items-start gap-4">
-        <div className="w-10 h-10 rounded-xl bg-[#E6FAF9] flex items-center justify-center flex-shrink-0">
-          <svg className="w-5 h-5 text-[#00ADA9]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-        </div>
-        <div className="flex-1">
-          <h4 className="font-bold text-[#1B3A5C] mb-2">{title}</h4>
-          <p className="text-gray-600 text-sm leading-relaxed mb-4">{body}</p>
-          <a
-            href={link}
-            className="inline-flex items-center gap-2 bg-[#00ADA9] hover:bg-[#008a87] text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
-          >
-            {cta}
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </a>
-        </div>
-      </div>
+    <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+      <span
+        className="inline-block text-white text-xs font-bold px-2.5 py-1 rounded-full mb-3"
+        style={{ backgroundColor: badgeColor }}
+      >
+        {category}
+      </span>
+      <h4 className="font-bold text-[#1B3A5C] text-sm mb-1">{name}</h4>
+      <p className="text-gray-500 text-sm leading-relaxed mb-4">{description}</p>
+      <a
+        href="mailto:info@peoplelogy.com"
+        className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#00ADA9] hover:text-[#008a87] transition-colors"
+      >
+        Find out more
+        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
+      </a>
     </div>
   )
 }
 
-const ORG_RECOMMENDATIONS = {
-  'Strategy & Leadership': {
-    title: 'AI Strategy & Leadership Alignment',
-    body: 'PEOPLElogy offers executive-level AI transformation programmes designed to align leadership teams and build a clear AI vision. [Programme details to be added]',
-  },
-  'Data & Technology Infrastructure': {
-    title: 'Data & Technology Readiness',
-    body: 'Our technology readiness assessment and advisory services help organisations build the data infrastructure needed for AI. [Programme details to be added]',
-  },
-  'People & Workforce Skills': {
-    title: 'AI Workforce Development',
-    body: "PEOPLElogy's AI literacy and workforce capability programmes build the skills your people need to work effectively with AI. [Programme details to be added]",
-  },
-  'Processes & AI Use Cases': {
-    title: 'AI Use Case Identification',
-    body: 'Our facilitated AI use case workshops help organisations identify, prioritise and pilot the highest-value AI opportunities. [Programme details to be added]',
-  },
-  'Governance, Risk & Responsible AI': {
-    title: 'AI Governance & Policy',
-    body: 'PEOPLElogy helps organisations build responsible AI governance frameworks aligned to PDPA and industry best practices. [Programme details to be added]',
-  },
+// ── Programme catalogue ───────────────────────────────────────────────────────
+
+const INDUSTRY_PROGRAMMES = {
+  'Financial Services & Banking': { name: 'AI for Finance & Banking Excellence', description: 'Apply AI to risk, compliance, customer experience and operations in financial services.' },
+  'Insurance':                    { name: 'AI for Finance & Banking Excellence', description: 'Apply AI to risk, compliance, customer experience and operations in financial services.' },
+  'Technology & Digital':         { name: 'AI for Fintech Excellence', description: 'Build AI-driven digital products and services for the next generation of financial technology.' },
+  'Manufacturing & Engineering':  { name: 'AI for Manufacturing Excellence', description: 'Drive efficiency, quality and predictive maintenance with AI on the factory floor.' },
+  'Logistics & Supply Chain':     { name: 'AI for Supply Chain Excellence', description: 'Optimise logistics, demand planning and procurement with AI-powered intelligence.' },
+  'Retail & Consumer':            { name: 'AI For Retail & E-Commerce Excellence', description: 'Transform customer personalisation, inventory management and sales with retail AI.' },
+  'Professional Services':        { name: 'AI for Procurement Excellence', description: 'Streamline procurement, vendor management and spend analysis using AI tools.' },
+  'Healthcare & Life Sciences':   { name: 'AI for Healthcare Excellence', description: 'Improve clinical workflows, patient outcomes and administrative efficiency through AI.' },
+  'Education & Training':         { name: 'AI for Education Excellence', description: 'Enhance learning design, student engagement and administrative processes with AI.' },
+}
+
+const FUNCTION_PROGRAMMES = {
+  'Sales & Business Development': { name: 'AI for Sales & Commercial Excellence', description: 'Close more deals faster with AI-powered research, outreach and proposal generation.' },
+  'Technology & Digital':         { name: 'AI for Business Analyst Excellence', description: 'Accelerate requirements gathering, data analysis and reporting with AI tools.' },
+  'Operations & Process':         { name: 'AI for Operations Excellence', description: 'Automate repetitive processes and improve decision-making across your operations with AI.' },
+  'Human Resources & People':     { name: 'AI for HR & Administration Excellence', description: 'Streamline talent acquisition, employee engagement and HR workflows using AI.' },
+  'Marketing & Branding':         { name: 'AI for Marketing Excellence', description: 'Create, personalise and optimise marketing content and campaigns at scale with AI.' },
+}
+const FN_DEFAULT_PRACTITIONER = { name: 'AI for Operations Excellence', description: 'Automate repetitive processes and improve decision-making across your operations with AI.' }
+
+const BUILDER_BY_FUNCTION = {
+  'Technology & Digital':  [
+    { name: 'Advanced LLM, Agents & AI Engineering', description: 'Design and deploy production-ready AI agents and LLM-powered applications.' },
+    { name: 'Python with AI Agents Development', description: 'Build custom AI agents and automation pipelines from scratch using Python.' },
+  ],
+  'Product & Innovation': [
+    { name: 'Vibe Coding & Rapid Prototyping', description: 'Go from idea to working AI-powered product in hours with modern vibe coding tools.' },
+    { name: 'AI Agents & Automation Building', description: 'Design, build and deploy AI agents that work autonomously across your business processes.' },
+  ],
+}
+const BUILDER_DEFAULT = [
+  { name: 'AI Agents & Automation Building', description: 'Design, build and deploy AI agents that work autonomously across your business processes.' },
+  { name: 'Automation Extension with AI Agents', description: 'Extend your existing automation stack with intelligent AI agents and integrations.' },
+]
+
+function mkCard(category, badgeColor, name, description) {
+  return { category, badgeColor, name, description }
+}
+
+function buildRecommendations(intake, orgScores, individualScores, path) {
+  const showOrg        = path === 'org'        || path === 'full'
+  const showIndividual = path === 'individual' || path === 'full'
+
+  const industry  = intake.industry        || ''
+  const fn        = intake.primaryFunction || ''
+  const roleLevel = intake.roleLevel       || ''
+  const capLabel  = individualScores?.capabilityLabel || ''
+
+  const getPillarPct = (id) =>
+    orgScores?.pillarScores?.find(p => p.pillar === id)?.percentage ?? null
+
+  const strategyPct  = showOrg ? getPillarPct(1) : null   // Pillar 1: Strategy & Leadership
+  const peoplePct    = showOrg ? getPillarPct(3) : null   // Pillar 3: People & Workforce Skills
+  const processesPct = showOrg ? getPillarPct(4) : null   // Pillar 4: Processes & AI Use Cases
+
+  const isCsuiteOrDirector = /C-Suite|Director|VP/.test(roleLevel)
+
+  const cards = []
+
+  // ── AI LITERACY ────────────────────────────────────────────────────────────
+  const wantsLiteracy =
+    (peoplePct !== null && peoplePct < 50) ||
+    capLabel === 'AI Beginner' || capLabel === 'AI Explorer'
+
+  if (wantsLiteracy) {
+    cards.push(mkCard('AI LITERACY', '#00ADA9',
+      'AI Literacy for the Modern Workplace',
+      'Build foundational AI awareness and practical skills across your organisation to accelerate adoption.'))
+    const second = capLabel === 'AI Explorer'
+      ? { name: 'Prompt Engineering & Multi-Tool Gen AI for Productivity', description: 'Master prompt techniques across multiple AI tools to maximise the quality of every output.' }
+      : { name: 'Workplace Productivity — Copilot Mastery', description: 'Unlock daily productivity gains using Microsoft Copilot in Word, Outlook, Teams and Excel.' }
+    cards.push(mkCard('AI LITERACY', '#00ADA9', second.name, second.description))
+  }
+
+  // ── AI PRACTITIONER ────────────────────────────────────────────────────────
+  const wantsPractitioner =
+    (processesPct !== null && processesPct < 50) || capLabel === 'AI Practitioner'
+
+  if (wantsPractitioner) {
+    const industryProg = INDUSTRY_PROGRAMMES[industry] || null
+    const fnProg       = FUNCTION_PROGRAMMES[fn] || FN_DEFAULT_PRACTITIONER
+
+    if (industryProg) {
+      cards.push(mkCard('AI PRACTITIONER', '#1B3A5C', industryProg.name, industryProg.description))
+      if (fnProg.name !== industryProg.name) {
+        cards.push(mkCard('AI PRACTITIONER', '#1B3A5C', fnProg.name, fnProg.description))
+      }
+    } else {
+      cards.push(mkCard('AI PRACTITIONER', '#1B3A5C', fnProg.name, fnProg.description))
+    }
+  }
+
+  // ── AI BUILDER ─────────────────────────────────────────────────────────────
+  const wantsBuilder =
+    capLabel === 'AI Integrator' || capLabel === 'AI Champion' ||
+    fn === 'Technology & Digital' || fn === 'Product & Innovation'
+
+  if (wantsBuilder) {
+    const builderProgs = BUILDER_BY_FUNCTION[fn] || BUILDER_DEFAULT
+    builderProgs.forEach(p =>
+      cards.push(mkCard('AI BUILDER', '#534AB7', p.name, p.description)))
+  }
+
+  // ── AI LEADERSHIP ──────────────────────────────────────────────────────────
+  const wantsLeadership =
+    (strategyPct !== null && strategyPct < 50) || isCsuiteOrDirector
+
+  if (wantsLeadership) {
+    cards.push(mkCard('AI LEADERSHIP', '#BA7517',
+      'AI Leader & Strategy',
+      'Develop your AI leadership playbook — vision, governance, culture change and ROI measurement.'))
+    if (isCsuiteOrDirector) {
+      cards.push(mkCard('AI LEADERSHIP', '#BA7517',
+        'AI for C-Suites & Management: Strategic Insights for Business Impact',
+        'Equip your leadership team with the strategic AI knowledge to drive organisation-wide transformation.'))
+    }
+  }
+
+  // ── Enforce 2–4 total ──────────────────────────────────────────────────────
+  let result = cards.slice(0, 4)
+
+  if (result.length === 0) {
+    result = [
+      mkCard('AI LITERACY', '#00ADA9', 'AI Literacy for the Modern Workplace',
+        'Build foundational AI awareness and practical skills across your organisation to accelerate adoption.'),
+      mkCard('AI LEADERSHIP', '#BA7517', 'AI Leader & Strategy',
+        'Develop your AI leadership playbook — vision, governance, culture change and ROI measurement.'),
+    ]
+  } else if (result.length === 1) {
+    result.push(mkCard('AI LITERACY', '#00ADA9', 'AI Literacy for the Modern Workplace',
+      'Build foundational AI awareness and practical skills across your organisation to accelerate adoption.'))
+  }
+
+  return result
 }
 
 export default function Results() {
@@ -208,22 +321,7 @@ export default function Results() {
   }
 
   // Recommendations
-  const recommendations = []
-  if (showOrg && orgScores) {
-    const weakPillarName = orgScores.weakestPillar?.name
-    const rec = ORG_RECOMMENDATIONS[weakPillarName]
-    if (rec) recommendations.push(rec)
-  }
-  if (showIndividual && individualScores) {
-    const label = individualScores.capabilityLabel
-    if (label === 'AI Beginner' || label === 'AI Explorer') {
-      recommendations.push({
-        title: 'AI Literacy Programme',
-        body: "Build your personal AI capability with PEOPLElogy's structured AI literacy programme designed for working professionals. [Programme details to be added]",
-        cta: 'Find out more',
-      })
-    }
-  }
+  const recommendations = buildRecommendations(intake, orgScores, individualScores, path)
 
   // Radar data for org
   const radarData = orgScores?.pillarScores.map(p => ({
@@ -467,10 +565,26 @@ export default function Results() {
               </span>
               What PEOPLElogy Can Help With
             </h2>
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
               {recommendations.map((rec, i) => (
                 <RecommendationCard key={i} {...rec} />
               ))}
+            </div>
+
+            {/* CTA banner */}
+            <div className="bg-[#00ADA9] rounded-2xl p-6">
+              <h3 className="text-white font-bold text-base mb-2">
+                Want a full AI Transformation Roadmap for your organisation?
+              </h3>
+              <p className="text-white/80 text-sm leading-relaxed mb-4">
+                PEOPLElogy offers end-to-end AI transformation consulting, training and technology solutions tailored to your industry and maturity level.
+              </p>
+              <a
+                href="mailto:info@peoplelogy.com"
+                className="inline-flex items-center gap-2 bg-white text-[#00ADA9] font-bold text-sm px-4 py-2.5 rounded-xl hover:bg-gray-50 transition-colors"
+              >
+                Talk to PEOPLElogy →
+              </a>
             </div>
           </div>
         )}
