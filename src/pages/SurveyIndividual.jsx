@@ -215,6 +215,7 @@ export default function SurveyIndividual() {
       }
 
       // INSERT into openday_individual_capability (NOT openday_sessions)
+      console.log('[SurveyIndividual] Inserting into', INDIVIDUAL_TABLE, payload)
       const { data, error } = await supabase
         .from(INDIVIDUAL_TABLE)
         .insert(payload)
@@ -222,21 +223,19 @@ export default function SurveyIndividual() {
         .single()
 
       if (error) {
-        // Surface the Supabase error so it can be diagnosed
         console.error('[SurveyIndividual] Supabase insert error:', error)
-        setSaveError(`Could not save your responses: ${error.message}. Your results will still be shown, but may not be recorded.`)
-        // Still navigate so the user sees their results — scores are held in React state
-        navigate('/results')
+        setSaveError(`Could not save your responses: ${error.message}`)
         return
       }
 
+      console.log('[SurveyIndividual] Successfully saved to', INDIVIDUAL_TABLE, 'id:', data.id, '| response_id (org link):', payload.response_id)
       if (data?.id) {
         setIndividualResponseId(data.id)
-        console.log('[SurveyIndividual] Saved to', INDIVIDUAL_TABLE, 'with id:', data.id, '| response_id (org link):', payload.response_id)
       }
     } catch (err) {
       console.error('[SurveyIndividual] Unexpected error:', err)
-      setSaveError('An unexpected error occurred. Your results will still be shown.')
+      setSaveError('An unexpected error occurred. Please try again.')
+      return
     } finally {
       setSaving(false)
     }
@@ -294,7 +293,16 @@ export default function SurveyIndividual() {
             <svg className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <p className="text-red-700 text-xs">{saveError}</p>
+            <div>
+              <p className="text-red-700 text-xs">{saveError}</p>
+              <button
+                type="button"
+                onClick={() => navigate('/results')}
+                className="text-xs text-red-500 underline mt-1.5 hover:text-red-700"
+              >
+                Continue without saving →
+              </button>
+            </div>
           </div>
         )}
 

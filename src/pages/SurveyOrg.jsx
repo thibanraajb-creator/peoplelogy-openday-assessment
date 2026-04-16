@@ -106,6 +106,7 @@ export default function SurveyOrg() {
       }
 
       // INSERT into openday_responses
+      console.log('[SurveyOrg] Inserting into', ORG_TABLE, payload)
       const { data, error } = await supabase
         .from(ORG_TABLE)
         .insert(payload)
@@ -114,24 +115,19 @@ export default function SurveyOrg() {
 
       if (error) {
         console.error('[SurveyOrg] Supabase insert error:', error)
-        setSaveError(`Could not save your responses: ${error.message}. Your results will still be shown.`)
-        // Navigate anyway so user sees their results (scores are in React state)
-        if (path === 'full') {
-          navigate('/transition')
-        } else {
-          navigate('/results')
-        }
+        setSaveError(`Could not save your responses: ${error.message}`)
         return
       }
 
+      console.log('[SurveyOrg] Successfully saved to', ORG_TABLE, 'id:', data.id)
       if (data?.id) {
         // Store the UUID so SurveyIndividual can link to it via response_id (full path)
         setOrgResponseId(data.id)
-        console.log('[SurveyOrg] Saved to', ORG_TABLE, 'with id:', data.id)
       }
     } catch (err) {
       console.error('[SurveyOrg] Unexpected error:', err)
-      setSaveError('An unexpected error occurred. Your results will still be shown.')
+      setSaveError('An unexpected error occurred. Please try again.')
+      return
     } finally {
       setSaving(false)
     }
@@ -214,7 +210,16 @@ export default function SurveyOrg() {
             <svg className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <p className="text-red-700 text-xs">{saveError}</p>
+            <div>
+              <p className="text-red-700 text-xs">{saveError}</p>
+              <button
+                type="button"
+                onClick={() => path === 'full' ? navigate('/transition') : navigate('/results')}
+                className="text-xs text-red-500 underline mt-1.5 hover:text-red-700"
+              >
+                Continue without saving →
+              </button>
+            </div>
           </div>
         )}
 
