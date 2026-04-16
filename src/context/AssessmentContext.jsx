@@ -22,12 +22,12 @@ export function AssessmentProvider({ children }) {
 
     // Layer 1 org survey responses
     orgResponses: {
-      // pillar1: [q1, q2, q3, q4]
-      pillar1: [null, null, null, null],
-      pillar2: [null, null, null, null],
-      pillar3: [null, null, null, null],
-      pillar4: [null, null, null, null],
-      pillar5: [null, null, null, null],
+      // pillar1: [q1, q2, q3, q4, q5]
+      pillar1: [null, null, null, null, null],
+      pillar2: [null, null, null, null, null],
+      pillar3: [null, null, null, null, null],
+      pillar4: [null, null, null, null, null],
+      pillar5: [null, null, null, null, null],
     },
 
     // Layer 1 computed scores

@@ -170,7 +170,7 @@ export default function SurveyOrg() {
           <div className="w-full bg-gray-100 rounded-full h-2">
             <div
               className="bg-[#00ADA9] h-2 rounded-full transition-all duration-500"
-              style={{ width: `${((currentPillar * 4 + answeredCount) / 20) * 100}%` }}
+              style={{ width: `${((currentPillar * 5 + answeredCount) / 25) * 100}%` }}
             />
           </div>
           {/* Pillar progress dots */}
