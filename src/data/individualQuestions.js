@@ -565,6 +565,66 @@ const CLUSTER_C = [
       { text: 'I would not trust it', score: 1 },
     ],
   },
+  {
+    id: 11,
+    dimension: 'D3',
+    type: 'single_select',
+    question: 'How do you brief AI when creating a campaign concept for a new product launch?',
+    options: [
+      { text: 'Target audience, key message, tone, format and examples of good campaigns', score: 4 },
+      { text: 'Describe the product and ask for ideas', score: 3 },
+      { text: 'Ask for a generic campaign idea', score: 2 },
+      { text: 'I do not use AI for campaign concepting', score: 1 },
+    ],
+  },
+  {
+    id: 12,
+    dimension: 'D2',
+    type: 'single_select',
+    question: 'How often do you use AI to repurpose content across different formats such as blog to social or video to caption?',
+    options: [
+      { text: 'Regularly, it is part of my workflow', score: 4 },
+      { text: 'Sometimes', score: 3 },
+      { text: 'Rarely', score: 2 },
+      { text: 'Never', score: 1 },
+    ],
+  },
+  {
+    id: 13,
+    dimension: 'D5',
+    type: 'single_select',
+    question: 'Has your content output volume increased because of AI tools in the last 3 months?',
+    options: [
+      { text: 'Yes, significantly more output', score: 4 },
+      { text: 'Yes, slightly more', score: 3 },
+      { text: 'Same volume', score: 2 },
+      { text: 'I have not used AI for content yet', score: 1 },
+    ],
+  },
+  {
+    id: 14,
+    dimension: 'D1',
+    type: 'single_select',
+    question: 'How do you ensure AI-generated content is accurate and not misleading before publishing?',
+    options: [
+      { text: 'I always fact-check, edit for accuracy and have it reviewed', score: 4 },
+      { text: 'I read through it carefully before publishing', score: 3 },
+      { text: 'I trust the AI output and publish directly', score: 1 },
+      { text: 'I only use AI for visuals not written content', score: 2 },
+    ],
+  },
+  {
+    id: 15,
+    dimension: 'D4',
+    type: 'single_select',
+    question: 'Which AI capability would create the most value in your marketing or creative role?',
+    options: [
+      { text: 'Automated content calendar generation', score: 3 },
+      { text: 'AI-powered audience targeting and personalisation', score: 4 },
+      { text: 'Visual and image generation', score: 3 },
+      { text: 'I am not sure yet', score: 2 },
+    ],
+  },
 ]
 
 // CLUSTER D
@@ -697,6 +757,66 @@ const CLUSTER_D = [
       { text: 'It depends on the data classification of the codebase', score: 4 },
     ],
   },
+  {
+    id: 11,
+    dimension: 'D3',
+    type: 'single_select',
+    question: 'How do you use AI to speed up code review or debugging?',
+    options: [
+      { text: 'I paste the code with full context and ask AI to identify issues and suggest fixes', score: 4 },
+      { text: 'I ask AI to explain what the code does', score: 3 },
+      { text: 'I only use AI for writing new code not reviewing', score: 2 },
+      { text: 'I do not use AI for code review', score: 1 },
+    ],
+  },
+  {
+    id: 12,
+    dimension: 'D5',
+    type: 'single_select',
+    question: 'Have you used AI to generate or improve technical documentation or API specs?',
+    options: [
+      { text: 'Yes, regularly', score: 4 },
+      { text: 'Yes, occasionally', score: 3 },
+      { text: 'Not yet but planning to', score: 2 },
+      { text: 'No', score: 1 },
+    ],
+  },
+  {
+    id: 13,
+    dimension: 'D2',
+    type: 'single_select',
+    question: 'How proficient are you with prompt engineering for technical outputs such as code, data transformation or system design?',
+    options: [
+      { text: 'Very proficient, I write structured multi-step prompts', score: 4 },
+      { text: 'Intermediate, I can get good results with some iteration', score: 3 },
+      { text: 'Basic, I write simple prompts and get mixed results', score: 2 },
+      { text: 'Beginner, I am still learning how to prompt effectively', score: 1 },
+    ],
+  },
+  {
+    id: 14,
+    dimension: 'D4',
+    type: 'single_select',
+    question: 'Which AI capability would add the most value to your technical role?',
+    options: [
+      { text: 'AI-assisted code generation and review', score: 4 },
+      { text: 'Automated testing and QA', score: 4 },
+      { text: 'AI for system architecture design', score: 3 },
+      { text: 'I am not sure yet', score: 2 },
+    ],
+  },
+  {
+    id: 15,
+    dimension: 'D1',
+    type: 'single_select',
+    question: 'How do you stay updated on new AI tools and capabilities relevant to your technical role?',
+    options: [
+      { text: 'I actively experiment with new tools and follow AI research', score: 4 },
+      { text: 'I read articles and follow industry news', score: 3 },
+      { text: 'I learn when my team or manager shares something', score: 2 },
+      { text: 'I do not actively follow AI developments', score: 1 },
+    ],
+  },
 ]
 
 // CLUSTER E
@@ -826,6 +946,66 @@ const CLUSTER_E = [
     question: 'If you had 1 hour per week to learn AI tools for your role, what would you focus on first?',
     placeholder: 'Describe what you would focus on...',
     defaultScore: 3,
+  },
+  {
+    id: 11,
+    dimension: 'D3',
+    type: 'single_select',
+    question: 'How do you currently use AI to personalise learning experiences for different participant groups?',
+    options: [
+      { text: 'I use AI to create tailored content variants for different roles and levels', score: 4 },
+      { text: 'I use AI to suggest personalisation ideas then implement manually', score: 3 },
+      { text: 'I do not personalise, one version for all', score: 2 },
+      { text: 'I have not thought about using AI for personalisation', score: 1 },
+    ],
+  },
+  {
+    id: 12,
+    dimension: 'D2',
+    type: 'single_select',
+    question: 'How often do you use AI to generate icebreakers, activities or energisers for your training sessions?',
+    options: [
+      { text: 'Regularly, AI is part of my session design toolkit', score: 4 },
+      { text: 'Occasionally', score: 3 },
+      { text: 'Rarely', score: 2 },
+      { text: 'Never', score: 1 },
+    ],
+  },
+  {
+    id: 13,
+    dimension: 'D5',
+    type: 'single_select',
+    question: 'Have you built any AI-assisted learning tools or resources for your participants in the last 6 months?',
+    options: [
+      { text: 'Yes, multiple', score: 4 },
+      { text: 'Yes, one', score: 3 },
+      { text: 'Planning to', score: 2 },
+      { text: 'No', score: 1 },
+    ],
+  },
+  {
+    id: 14,
+    dimension: 'D1',
+    type: 'single_select',
+    question: 'How confident are you facilitating a session specifically about AI literacy for non-technical staff?',
+    options: [
+      { text: 'Very confident, I have done it before', score: 4 },
+      { text: 'Fairly confident, I could prepare and deliver it', score: 3 },
+      { text: 'Not very confident, I would need support', score: 2 },
+      { text: 'Not at all confident', score: 1 },
+    ],
+  },
+  {
+    id: 15,
+    dimension: 'D4',
+    type: 'single_select',
+    question: 'Which AI application would most transform your L&D practice?',
+    options: [
+      { text: 'AI that generates complete course content from a learning brief', score: 4 },
+      { text: 'AI that personalises learning paths for each learner automatically', score: 4 },
+      { text: 'AI that analyses learner performance and recommends interventions', score: 3 },
+      { text: 'I am not sure yet', score: 2 },
+    ],
   },
 ]
 
