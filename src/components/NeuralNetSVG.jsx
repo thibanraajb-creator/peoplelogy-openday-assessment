@@ -101,11 +101,16 @@ export default function NeuralNetSVG() {
   return (
     <svg
       viewBox="0 0 400 500"
-      className="w-full h-full"
+      width="400"
+      height="500"
+      className="w-full h-auto"
       aria-hidden="true"
       xmlns="http://www.w3.org/2000/svg"
     >
       <style>{CSS}</style>
+
+      {/* Background rect — confirms SVG renders and sets visible bounds */}
+      <rect width="400" height="500" fill="rgba(0,173,169,0.07)" rx="20" />
 
       {/* Static connection lines */}
       {CONNECTIONS.map((c, i) => (

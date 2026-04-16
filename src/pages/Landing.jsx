@@ -52,10 +52,10 @@ export default function Landing() {
 
       {/* Hero */}
       <section className="max-w-6xl mx-auto px-6 pt-12 pb-10">
-        <div className="grid lg:grid-cols-5 gap-8 lg:gap-4 items-center">
+        <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
 
           {/* Left column — text (60%) */}
-          <div className="lg:col-span-3 text-center lg:text-left">
+          <div className="flex-1 md:basis-3/5 text-center md:text-left">
             <div className="inline-flex items-center gap-2 bg-[#00ADA9]/20 border border-[#00ADA9]/30 text-[#00ADA9] text-xs font-bold px-4 py-2 rounded-full uppercase tracking-widest mb-8">
               <span className="w-1.5 h-1.5 bg-[#00ADA9] rounded-full"></span>
               Powered by PEOPLElogy
@@ -67,7 +67,7 @@ export default function Landing() {
             </h1>
 
             <p className="text-white/70 text-lg mb-8 leading-relaxed">
-              Discover where you and your organisation stand on AI adoption.<br className="hidden lg:block" />
+              Discover where you and your organisation stand on AI adoption.<br className="hidden md:block" />
               Get your personal report instantly.
             </p>
 
@@ -80,9 +80,9 @@ export default function Landing() {
             </div>
           </div>
 
-          {/* Right column — neural net SVG (40%), hidden on mobile */}
-          <div className="hidden lg:flex lg:col-span-2 items-center justify-center">
-            <div className="w-full max-w-[320px]">
+          {/* Right column — neural net SVG (40%), hidden below md (768px) */}
+          <div className="hidden md:flex md:basis-2/5 items-center justify-center shrink-0">
+            <div className="w-full max-w-[300px]">
               <NeuralNetSVG />
             </div>
           </div>

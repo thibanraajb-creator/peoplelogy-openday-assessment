@@ -19,19 +19,82 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [lastUpdated, setLastUpdated] = useState(null)
   const [activeTab, setActiveTab] = useState('org')
+  const [fetchError, setFetchError] = useState(null)
+  const [debugInfo, setDebugInfo] = useState(null)
 
   const fetchData = async () => {
     setLoading(true)
+    setFetchError(null)
+
+    console.log('[Dashboard] Fetching data, session_code:', SESSION_CODE)
+    console.log('[Dashboard] Supabase URL:', import.meta.env.VITE_SUPABASE_URL)
+
     try {
       const [orgRes, indRes] = await Promise.all([
-        supabase.from('openday_responses').select('*').eq('session_code', SESSION_CODE).order('created_at', { ascending: false }),
-        supabase.from('openday_individual_capability').select('*').eq('session_code', SESSION_CODE).order('created_at', { ascending: false }),
+        supabase
+          .from('openday_responses')
+          .select('*')
+          .eq('session_code', SESSION_CODE)
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('openday_individual_capability')
+          .select('*')
+          .eq('session_code', SESSION_CODE)
+          .order('created_at', { ascending: false }),
       ])
-      setOrgData(orgRes.data || [])
-      setIndData(indRes.data || [])
+
+      // Always log the raw Supabase responses for debugging
+      console.log('[Dashboard] openday_responses →', {
+        rows: (orgRes.data || []).length,
+        error: orgRes.error,
+        status: orgRes.status,
+        statusText: orgRes.statusText,
+      })
+      console.log('[Dashboard] openday_individual_capability →', {
+        rows: (indRes.data || []).length,
+        error: indRes.error,
+        status: indRes.status,
+        statusText: indRes.statusText,
+      })
+
+      const errors = []
+      if (orgRes.error) {
+        console.error('[Dashboard] openday_responses error:', orgRes.error)
+        errors.push(`openday_responses: ${orgRes.error.message} (code ${orgRes.error.code})`)
+      }
+      if (indRes.error) {
+        console.error('[Dashboard] openday_individual_capability error:', indRes.error)
+        errors.push(`openday_individual_capability: ${indRes.error.message} (code ${indRes.error.code})`)
+      }
+
+      if (errors.length > 0) {
+        setFetchError(errors.join(' | '))
+      }
+
+      const orgRows = orgRes.data || []
+      const indRows = indRes.data || []
+
+      if (orgRows.length === 0 && !orgRes.error) {
+        console.log('[Dashboard] No data in openday_responses for session_code =', SESSION_CODE)
+      }
+      if (indRows.length === 0 && !indRes.error) {
+        console.log('[Dashboard] No data in openday_individual_capability for session_code =', SESSION_CODE)
+      }
+
+      setOrgData(orgRows)
+      setIndData(indRows)
+      setDebugInfo({
+        orgRows: orgRows.length,
+        indRows: indRows.length,
+        orgError: orgRes.error?.message || null,
+        indError: indRes.error?.message || null,
+        sessionCode: SESSION_CODE,
+        fetchedAt: new Date().toISOString(),
+      })
       setLastUpdated(new Date())
     } catch (err) {
-      console.error('Fetch error:', err)
+      console.error('[Dashboard] Unexpected JS error (not a Supabase error):', err)
+      setFetchError(`Unexpected error: ${err.message}`)
     } finally {
       setLoading(false)
     }
@@ -148,22 +211,62 @@ export default function Dashboard() {
         {/* Page title */}
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-[#1B3A5C]">Live Dashboard</h1>
-          <p className="text-gray-500 text-sm">Open Day JB · 5 May 2026 · Session JBOPEN2026</p>
+          <p className="text-gray-500 text-sm">Open Day JB · 5 May 2026 · Session {SESSION_CODE}</p>
         </div>
 
-        {isEmpty ? (
+        {/* Loading state */}
+        {loading && (
+          <div className="flex items-center gap-3 bg-white rounded-xl px-5 py-4 border border-gray-100 shadow-sm mb-6">
+            <svg className="animate-spin w-5 h-5 text-[#00ADA9]" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            <span className="text-gray-600 text-sm">Fetching data from Supabase…</span>
+          </div>
+        )}
+
+        {/* Supabase error banner */}
+        {fetchError && (
+          <div className="bg-red-50 border border-red-200 rounded-xl px-5 py-4 mb-6">
+            <p className="text-red-700 text-sm font-semibold mb-1">Supabase query error — check RLS policies</p>
+            <p className="text-red-600 text-xs font-mono">{fetchError}</p>
+            <p className="text-red-500 text-xs mt-2">
+              Run in Supabase SQL editor:<br />
+              <code className="bg-red-100 px-1 rounded">
+                CREATE POLICY "anon select" ON openday_responses FOR SELECT USING (true);<br />
+                CREATE POLICY "anon select" ON openday_individual_capability FOR SELECT USING (true);
+              </code>
+            </p>
+          </div>
+        )}
+
+        {/* Debug row counts — always visible after fetch */}
+        {!loading && debugInfo && (
+          <div className="bg-white border border-gray-200 rounded-xl px-5 py-3 mb-6 flex flex-wrap gap-6 text-xs text-gray-500">
+            <span>Session: <strong className="text-[#1B3A5C]">{debugInfo.sessionCode}</strong></span>
+            <span>openday_responses: <strong className={debugInfo.orgError ? 'text-red-600' : 'text-[#00ADA9]'}>{debugInfo.orgError ? `ERROR — ${debugInfo.orgError}` : `${debugInfo.orgRows} rows`}</strong></span>
+            <span>openday_individual_capability: <strong className={debugInfo.indError ? 'text-red-600' : 'text-[#00ADA9]'}>{debugInfo.indError ? `ERROR — ${debugInfo.indError}` : `${debugInfo.indRows} rows`}</strong></span>
+            <span className="text-gray-400">Fetched at {new Date(debugInfo.fetchedAt).toLocaleTimeString()}</span>
+          </div>
+        )}
+
+        {isEmpty && !loading ? (
           <div className="text-center py-24">
             <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
               <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
             </div>
-            <h3 className="text-[#1B3A5C] font-semibold mb-2">Waiting for responses...</h3>
+            <h3 className="text-[#1B3A5C] font-semibold mb-2">
+              {fetchError ? 'Could not load data — check the error above' : 'Waiting for responses...'}
+            </h3>
             <p className="text-gray-400 text-sm max-w-sm mx-auto">
-              Results will appear here as participants complete the assessment.
+              {fetchError
+                ? 'RLS policies may be blocking SELECT for the anon key. See instructions above.'
+                : `No submissions found for session code ${SESSION_CODE}.`}
             </p>
           </div>
-        ) : (
+        ) : !loading && (
           <>
             {/* Metric cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -341,7 +444,7 @@ export default function Dashboard() {
                           </span>
                         )}
                         {item.capabilityLabel && (
-                          <span className="text-xs bg-navy/10 text-[#1B3A5C] font-semibold px-2 py-1 rounded-full">
+                          <span className="text-xs bg-gray-100 text-[#1B3A5C] font-semibold px-2 py-1 rounded-full">
                             {item.capabilityLabel}
                           </span>
                         )}

@@ -25,22 +25,83 @@ function BigStat({ value, label, color = '#00ADA9' }) {
 export default function Facilitator() {
   const [orgData, setOrgData] = useState([])
   const [indData, setIndData] = useState([])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [lastUpdated, setLastUpdated] = useState(null)
+  const [fetchError, setFetchError] = useState(null)
+  const [debugInfo, setDebugInfo] = useState(null)
   const tickerRef = useRef(null)
 
   const fetchData = async () => {
     setLoading(true)
+    setFetchError(null)
+
+    console.log('[Facilitator] Fetching data, session_code:', SESSION_CODE)
+    console.log('[Facilitator] Supabase URL:', import.meta.env.VITE_SUPABASE_URL)
+
     try {
       const [orgRes, indRes] = await Promise.all([
-        supabase.from('openday_responses').select('*').eq('session_code', SESSION_CODE).order('created_at', { ascending: false }),
-        supabase.from('openday_individual_capability').select('*').eq('session_code', SESSION_CODE).order('created_at', { ascending: false }),
+        supabase
+          .from('openday_responses')
+          .select('*')
+          .eq('session_code', SESSION_CODE)
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('openday_individual_capability')
+          .select('*')
+          .eq('session_code', SESSION_CODE)
+          .order('created_at', { ascending: false }),
       ])
-      setOrgData(orgRes.data || [])
-      setIndData(indRes.data || [])
+
+      // Always log raw Supabase responses for debugging
+      console.log('[Facilitator] openday_responses →', {
+        rows: (orgRes.data || []).length,
+        error: orgRes.error,
+        status: orgRes.status,
+        statusText: orgRes.statusText,
+      })
+      console.log('[Facilitator] openday_individual_capability →', {
+        rows: (indRes.data || []).length,
+        error: indRes.error,
+        status: indRes.status,
+        statusText: indRes.statusText,
+      })
+
+      const errors = []
+      if (orgRes.error) {
+        console.error('[Facilitator] openday_responses error:', orgRes.error)
+        errors.push(`openday_responses: ${orgRes.error.message} (code ${orgRes.error.code})`)
+      }
+      if (indRes.error) {
+        console.error('[Facilitator] openday_individual_capability error:', indRes.error)
+        errors.push(`openday_individual_capability: ${indRes.error.message} (code ${indRes.error.code})`)
+      }
+
+      if (errors.length > 0) {
+        setFetchError(errors.join(' | '))
+      }
+
+      const orgRows = orgRes.data || []
+      const indRows = indRes.data || []
+
+      if (orgRows.length === 0 && !orgRes.error) {
+        console.log('[Facilitator] No data in openday_responses for session_code =', SESSION_CODE)
+      }
+      if (indRows.length === 0 && !indRes.error) {
+        console.log('[Facilitator] No data in openday_individual_capability for session_code =', SESSION_CODE)
+      }
+
+      setOrgData(orgRows)
+      setIndData(indRows)
+      setDebugInfo({
+        orgRows: orgRows.length,
+        indRows: indRows.length,
+        orgError: orgRes.error?.message || null,
+        indError: indRes.error?.message || null,
+      })
       setLastUpdated(new Date())
     } catch (err) {
-      console.error(err)
+      console.error('[Facilitator] Unexpected JS error:', err)
+      setFetchError(`Unexpected error: ${err.message}`)
     } finally {
       setLoading(false)
     }
@@ -135,17 +196,54 @@ export default function Facilitator() {
         </div>
       </div>
 
-      {isEmpty ? (
+      {/* Loading state */}
+      {loading && (
         <div className="flex items-center justify-center h-[80vh]">
           <div className="text-center">
+            <svg className="animate-spin w-10 h-10 text-[#00ADA9] mx-auto mb-4" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            <p className="text-white/50 text-lg">Loading…</p>
+          </div>
+        </div>
+      )}
+
+      {/* Error banner */}
+      {!loading && fetchError && (
+        <div className="mx-8 mt-6 bg-red-900/30 border border-red-500/40 rounded-xl px-5 py-4">
+          <p className="text-red-300 text-sm font-semibold mb-1">Supabase query error — RLS may be blocking SELECT</p>
+          <p className="text-red-400 text-xs font-mono">{fetchError}</p>
+          <p className="text-red-500/70 text-xs mt-2">
+            Run in Supabase SQL editor: CREATE POLICY "anon select" ON openday_responses FOR SELECT USING (true);
+          </p>
+        </div>
+      )}
+
+      {/* Debug row counts — always shown after fetch */}
+      {!loading && debugInfo && (
+        <div className="mx-8 mt-4 flex flex-wrap gap-6 text-xs text-white/30">
+          <span>Session: <strong className="text-white/60">{SESSION_CODE}</strong></span>
+          <span>openday_responses: <strong className={debugInfo.orgError ? 'text-red-400' : 'text-[#00ADA9]'}>{debugInfo.orgError ? `ERROR — ${debugInfo.orgError}` : `${debugInfo.orgRows} rows`}</strong></span>
+          <span>openday_individual_capability: <strong className={debugInfo.indError ? 'text-red-400' : 'text-[#00ADA9]'}>{debugInfo.indError ? `ERROR — ${debugInfo.indError}` : `${debugInfo.indRows} rows`}</strong></span>
+        </div>
+      )}
+
+      {!loading && isEmpty ? (
+        <div className="flex items-center justify-center h-[70vh]">
+          <div className="text-center">
             <div className="text-8xl font-black text-white/10 mb-4">0</div>
-            <h2 className="text-white/50 text-2xl font-semibold mb-2">Waiting for responses</h2>
+            <h2 className="text-white/50 text-2xl font-semibold mb-2">
+              {fetchError ? 'Data load error — see above' : 'Waiting for responses'}
+            </h2>
             <p className="text-white/30 text-base">
-              Results will appear here as participants complete the assessment.
+              {fetchError
+                ? 'Check Supabase RLS policies for SELECT access with anon key.'
+                : `No submissions found for session code ${SESSION_CODE}.`}
             </p>
           </div>
         </div>
-      ) : (
+      ) : !loading && (
         <div className="px-8 py-6">
           {/* Big stats */}
           <div className="grid grid-cols-4 gap-5 mb-8">
