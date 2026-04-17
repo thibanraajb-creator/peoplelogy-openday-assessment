@@ -160,8 +160,8 @@ export default function SurveyIndividual() {
 
       // Build l2_q1 through l2_q15 answer text fields
       const answerFields = {}
-      individualResponses.forEach((r, i) => {
-        const q = questions[i]
+      questions.forEach((q, i) => {
+        const r = individualResponses[i]
         if (r === null || r === undefined) {
           answerFields[`l2_q${i + 1}`] = null
         } else if (Array.isArray(r)) {
@@ -214,13 +214,14 @@ export default function SurveyIndividual() {
         ...answerFields,
       }
 
-      // INSERT into openday_individual_capability (NOT openday_sessions)
-      console.log('[SurveyIndividual] Inserting into', INDIVIDUAL_TABLE, payload)
+      console.log('[SurveyIndividual] Inserting payload:', JSON.stringify(payload, null, 2))
       const { data, error } = await supabase
         .from(INDIVIDUAL_TABLE)
         .insert(payload)
         .select('id')
         .single()
+
+      console.log('[SurveyIndividual] Insert result:', data, error)
 
       if (error) {
         console.error('[SurveyIndividual] Supabase insert error:', error)
@@ -228,7 +229,6 @@ export default function SurveyIndividual() {
         return
       }
 
-      console.log('[SurveyIndividual] Successfully saved to', INDIVIDUAL_TABLE, 'id:', data.id, '| response_id (org link):', payload.response_id)
       if (data?.id) {
         setIndividualResponseId(data.id)
       }
