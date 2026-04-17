@@ -196,8 +196,8 @@ export default function SurveyIndividual() {
 
         // Dimension scores (1–4 scale averages)
         d1_awareness_score: scores.dimensionAverages.D1,
-        d2_tool_use_score: scores.dimensionAverages.D2,
-        d3_prompt_ability_score: scores.dimensionAverages.D3,
+        d2_tool_score: scores.dimensionAverages.D2,
+        d3_prompt_score: scores.dimensionAverages.D3,
         d4_opportunity_score: scores.dimensionAverages.D4,
         d5_workflow_score: scores.dimensionAverages.D5,
 
