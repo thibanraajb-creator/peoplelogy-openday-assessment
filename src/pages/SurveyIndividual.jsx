@@ -218,16 +218,16 @@ export default function SurveyIndividual() {
 
       console.log('[DEBUG] About to insert payload:', JSON.stringify(payload))
       const { data, error } = await supabase
-        .from(INDIVIDUAL_TABLE)
-        .insert(payload)
+        .from('openday_individual_capability')
+        .insert([payload])
         .select('id')
         .single()
 
-      console.log('[DEBUG] Insert result - data:', data, 'error:', error)
       if (error) {
-        console.error('[SurveyIndividual] Supabase insert error:', JSON.stringify(error))
-        alert('Full error: ' + JSON.stringify(error))
-        setSaveError(`Could not save your responses: ${error.message}`)
+        const msg = 'Code: ' + error.code + ' | Message: ' + error.message + ' | Details: ' + error.details + ' | Hint: ' + error.hint
+        console.error('[SurveyIndividual] Insert error:', msg)
+        alert(msg)
+        navigate('/results')
         return
       }
 
