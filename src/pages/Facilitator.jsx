@@ -35,17 +35,26 @@ export default function Facilitator() {
     setLoading(true)
     setFetchError(null)
 
-    const { data: orgData, error: orgError } = await supabase
+    const orgRes = await supabase
       .from('openday_responses')
       .select('*')
       .eq('session_code', SESSION_CODE)
-    const { data: indData, error: indError } = await supabase
+      .order('submitted_at', { ascending: false })
+
+    console.log('Org data:', orgRes.data, orgRes.error)
+
+    const indRes = await supabase
       .from('openday_individual_capability')
       .select('*')
       .eq('session_code', SESSION_CODE)
+      .order('submitted_at', { ascending: false })
 
-    console.log('Org data:', orgData, orgError)
-    console.log('Individual data:', indData, indError)
+    console.log('Individual data:', indRes.data, indRes.error)
+
+    const orgData = orgRes.data
+    const orgError = orgRes.error
+    const indData = indRes.data
+    const indError = indRes.error
 
     const errors = []
     if (orgError) errors.push(`openday_responses: ${orgError.message} (code ${orgError.code})`)
