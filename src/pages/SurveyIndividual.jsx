@@ -225,10 +225,8 @@ export default function SurveyIndividual() {
 
       console.log('[DEBUG] Insert result - data:', data, 'error:', error)
       if (error) {
-        alert('Save error: ' + error.message + ' | Code: ' + error.code)
-      }
-
-      if (error) {
+        console.error('[SurveyIndividual] Supabase insert error:', JSON.stringify(error))
+        alert('Full error: ' + JSON.stringify(error))
         setSaveError(`Could not save your responses: ${error.message}`)
         return
       }
