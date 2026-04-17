@@ -158,7 +158,7 @@ export default function SurveyIndividual() {
       const scores = computeIndividualScores(individualResponses, cluster)
       setIndividualScores(scores)
 
-      // Build l2_q1 through l2_q10 answer text fields
+      // Build l2_q1 through l2_q15 answer text fields
       const answerFields = {}
       individualResponses.forEach((r, i) => {
         const q = questions[i]

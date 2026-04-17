@@ -35,76 +35,36 @@ export default function Facilitator() {
     setLoading(true)
     setFetchError(null)
 
-    console.log('[Facilitator] Fetching data, session_code:', SESSION_CODE)
-    console.log('[Facilitator] Supabase URL:', import.meta.env.VITE_SUPABASE_URL)
+    const { data: orgData, error: orgError } = await supabase
+      .from('openday_responses')
+      .select('*')
+      .eq('session_code', SESSION_CODE)
+    const { data: indData, error: indError } = await supabase
+      .from('openday_individual_capability')
+      .select('*')
+      .eq('session_code', SESSION_CODE)
 
-    try {
-      const [orgRes, indRes] = await Promise.all([
-        supabase
-          .from('openday_responses')
-          .select('*')
-          .eq('session_code', SESSION_CODE)
-          .order('created_at', { ascending: false }),
-        supabase
-          .from('openday_individual_capability')
-          .select('*')
-          .eq('session_code', SESSION_CODE)
-          .order('created_at', { ascending: false }),
-      ])
+    console.log('Org data:', orgData, orgError)
+    console.log('Individual data:', indData, indError)
 
-      // Always log raw Supabase responses for debugging
-      console.log('[Facilitator] openday_responses →', {
-        rows: (orgRes.data || []).length,
-        error: orgRes.error,
-        status: orgRes.status,
-        statusText: orgRes.statusText,
-      })
-      console.log('[Facilitator] openday_individual_capability →', {
-        rows: (indRes.data || []).length,
-        error: indRes.error,
-        status: indRes.status,
-        statusText: indRes.statusText,
-      })
+    const errors = []
+    if (orgError) errors.push(`openday_responses: ${orgError.message} (code ${orgError.code})`)
+    if (indError) errors.push(`openday_individual_capability: ${indError.message} (code ${indError.code})`)
+    if (errors.length > 0) setFetchError(errors.join(' | '))
 
-      const errors = []
-      if (orgRes.error) {
-        console.error('[Facilitator] openday_responses error:', orgRes.error)
-        errors.push(`openday_responses: ${orgRes.error.message} (code ${orgRes.error.code})`)
-      }
-      if (indRes.error) {
-        console.error('[Facilitator] openday_individual_capability error:', indRes.error)
-        errors.push(`openday_individual_capability: ${indRes.error.message} (code ${indRes.error.code})`)
-      }
+    const orgRows = orgData || []
+    const indRows = indData || []
 
-      if (errors.length > 0) {
-        setFetchError(errors.join(' | '))
-      }
-
-      const orgRows = orgRes.data || []
-      const indRows = indRes.data || []
-
-      if (orgRows.length === 0 && !orgRes.error) {
-        console.log('[Facilitator] No data in openday_responses for session_code =', SESSION_CODE)
-      }
-      if (indRows.length === 0 && !indRes.error) {
-        console.log('[Facilitator] No data in openday_individual_capability for session_code =', SESSION_CODE)
-      }
-
-      setOrgData(orgRows)
-      setIndData(indRows)
-      setDebugInfo({
-        orgRows: orgRows.length,
-        indRows: indRows.length,
-        orgError: orgRes.error?.message || null,
-        indError: indRes.error?.message || null,
-      })
-      setLastUpdated(new Date())
-    } catch (err) {
-      console.error('[Facilitator] Unexpected JS error:', err)
-      setFetchError(`Unexpected error: ${err.message}`)
-    } finally {
-      setLoading(false)
-    }
+    setOrgData(orgRows)
+    setIndData(indRows)
+    setDebugInfo({
+      orgRows: orgRows.length,
+      indRows: indRows.length,
+      orgError: orgError?.message || null,
+      indError: indError?.message || null,
+    })
+    setLastUpdated(new Date())
+    setLoading(false)
   }
 
   useEffect(() => { fetchData() }, [])

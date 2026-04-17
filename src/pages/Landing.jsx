@@ -1,5 +1,7 @@
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Logo from '../components/Logo'
+import { supabase, SESSION_CODE } from '../lib/supabase'
 
 function PathCard({ icon, title, description, time, buttonText, badge, onClick }) {
   return (
@@ -36,6 +38,34 @@ function PathCard({ icon, title, description, time, buttonText, badge, onClick }
 
 export default function Landing() {
   const navigate = useNavigate()
+  const [counts, setCounts] = useState({ total: 0, orgs: 0, champions: 0 })
+
+  useEffect(() => {
+    const fetchCounts = async () => {
+      const { data: orgRows } = await supabase
+        .from('openday_responses')
+        .select('organisation')
+        .eq('session_code', SESSION_CODE)
+      const { data: indRows } = await supabase
+        .from('openday_individual_capability')
+        .select('organisation, is_champion')
+        .eq('session_code', SESSION_CODE)
+
+      const allOrgs = new Set([
+        ...(orgRows || []).map(r => r.organisation),
+        ...(indRows || []).map(r => r.organisation),
+      ])
+      setCounts({
+        total: (orgRows?.length || 0) + (indRows?.length || 0),
+        orgs: allOrgs.size,
+        champions: (indRows || []).filter(r => r.is_champion).length,
+      })
+    }
+
+    fetchCounts()
+    const interval = setInterval(fetchCounts, 30000)
+    return () => clearInterval(interval)
+  }, [])
 
   const handleStart = (path) => {
     navigate('/intake', { state: { path } })
@@ -161,6 +191,30 @@ export default function Landing() {
           </svg>
         </div>
 
+      </div>
+
+      {/* Live Counter */}
+      <div className="max-w-6xl mx-auto px-6 py-6">
+        {counts.total === 0 && counts.orgs === 0 && counts.champions === 0 ? (
+          <p className="text-center text-white/40 text-sm">Be the first to complete an assessment today!</p>
+        ) : (
+          <div className="flex justify-center gap-4 flex-wrap">
+            {[
+              { value: counts.total, label: 'Assessments Completed' },
+              { value: counts.orgs, label: 'Organisations Assessed' },
+              { value: counts.champions, label: 'AI Champions Identified' },
+            ].map((stat, i) => (
+              <div
+                key={i}
+                className="border border-[#00ADA9]/50 rounded-xl px-8 py-4 text-center min-w-[160px]"
+                style={{ background: 'rgba(27,58,92,0.8)' }}
+              >
+                <div className="text-3xl font-black text-[#00ADA9]">{stat.value}</div>
+                <div className="text-white/60 text-xs mt-1">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Path Cards */}
