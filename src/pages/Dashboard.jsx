@@ -31,7 +31,7 @@ export default function Dashboard() {
         .from('openday_responses')
         .select('*')
         .eq('session_code', SESSION_CODE)
-        .order('created_at', { ascending: false })
+        .order('submitted_at', { ascending: false })
 
       console.log('[Dashboard] Org response:', orgRes)
 
@@ -39,7 +39,7 @@ export default function Dashboard() {
         .from('openday_individual_capability')
         .select('*')
         .eq('session_code', SESSION_CODE)
-        .order('created_at', { ascending: false })
+        .order('submitted_at', { ascending: false })
 
       console.log('[Dashboard] Individual response:', indRes)
 
@@ -131,16 +131,19 @@ export default function Dashboard() {
     }
   })
 
-  const liveFeed = [...orgData.map(d => ({ ...d, type: 'org' })), ...indData.map(d => ({ ...d, type: 'ind' }))]
+  const liveFeed = [
+    ...orgData.map(d => ({ ...d, type: 'org' })),
+    ...indData.map(d => ({ ...d, type: 'ind' }))
+  ]
     .map(d => ({
       firstName: d.first_name,
       organisation: d.organisation,
       maturityLevel: d.maturity_level ? `Level ${d.maturity_level}: ${MATURITY_LABELS[d.maturity_level]}` : null,
       capabilityLabel: d.capability_label || null,
-      createdAt: d.created_at,
+      submittedAt: d.submitted_at,
       type: d.type,
     }))
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt))
     .slice(0, 10)
 
   return (
@@ -176,8 +179,8 @@ export default function Dashboard() {
 
         {fetchError && (
           <div className="mb-6 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
-            <p className="text-red-700 text-sm font-medium">Fetch error: {fetchError}</p>
-            <p className="text-red-500 text-xs mt-1">Check browser console for details. Try refreshing.</p>
+            <p className="text-red-700 text-sm font-medium">Error: {fetchError}</p>
+            <p className="text-red-500 text-xs mt-1">Check browser console for details.</p>
           </div>
         )}
 
@@ -221,7 +224,11 @@ export default function Dashboard() {
                           : 'text-gray-500 hover:text-gray-700'
                       }`}
                     >
-                      {tab === 'org' ? `Organisation (${orgData.length})` : tab === 'individual' ? `Individual (${indData.length})` : 'Live Feed'}
+                      {tab === 'org'
+                        ? `Organisation (${orgData.length})`
+                        : tab === 'individual'
+                        ? `Individual (${indData.length})`
+                        : 'Live Feed'}
                     </button>
                   ))}
                 </div>
@@ -257,6 +264,7 @@ export default function Dashboard() {
                         </ResponsiveContainer>
                       </div>
                     </div>
+
                     <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
                       <h3 className="text-sm font-semibold text-[#1B3A5C] mb-4">Pillar Average Scores</h3>
                       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
@@ -271,6 +279,7 @@ export default function Dashboard() {
                         ))}
                       </div>
                     </div>
+
                     {industryData.length > 0 && (
                       <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
                         <h3 className="text-sm font-semibold text-[#1B3A5C] mb-4">Industry Breakdown</h3>
