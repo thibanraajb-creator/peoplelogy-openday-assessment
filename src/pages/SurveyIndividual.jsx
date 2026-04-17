@@ -212,19 +212,23 @@ export default function SurveyIndividual() {
 
         // Raw answer text for all 15 questions (l2_q1 – l2_q15)
         ...answerFields,
+
+        submitted_at: new Date().toISOString(),
       }
 
-      console.log('[SurveyIndividual] Inserting payload:', JSON.stringify(payload, null, 2))
+      console.log('[DEBUG] About to insert payload:', JSON.stringify(payload))
       const { data, error } = await supabase
         .from(INDIVIDUAL_TABLE)
         .insert(payload)
         .select('id')
         .single()
 
-      console.log('[SurveyIndividual] Insert result:', data, error)
+      console.log('[DEBUG] Insert result - data:', data, 'error:', error)
+      if (error) {
+        alert('Save error: ' + error.message + ' | Code: ' + error.code)
+      }
 
       if (error) {
-        console.error('[SurveyIndividual] Supabase insert error:', error)
         setSaveError(`Could not save your responses: ${error.message}`)
         return
       }
