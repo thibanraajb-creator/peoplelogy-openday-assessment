@@ -62,6 +62,7 @@ export default function Facilitator() {
       setOrgData(orgRes.data || [])
       setIndData(indRes.data || [])
       setLastUpdated(new Date())
+      console.log('[DEBUG] orgData:', orgRes.data?.length, 'indData:', indRes.data?.length)
     } catch (err) {
       console.error('[Facilitator] Unexpected error:', err)
       setFetchError(err.message)

@@ -62,6 +62,7 @@ export default function Dashboard() {
       setOrgData(org)
       setIndData(ind)
       setLastUpdated(new Date())
+      console.log('[DEBUG] orgData:', org?.length, 'indData:', ind?.length)
     } catch (err) {
       console.error('[Dashboard] Unexpected error:', err)
       setFetchError(err.message)
