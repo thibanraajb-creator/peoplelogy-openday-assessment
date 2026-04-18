@@ -122,7 +122,7 @@ export default function Dashboard() {
     .sort((a, b) => b.score - a.score)
 
   const dimAvgData = ['D1', 'D2', 'D3', 'D4', 'D5'].map((d, i) => {
-    const key = ['d1_awareness_score', 'd2_tool_use_score', 'd3_prompt_ability_score', 'd4_opportunity_score', 'd5_workflow_score'][i]
+    const key = ['d1_awareness_score', 'd2_tool_score', 'd3_prompt_score', 'd4_opportunity_score', 'd5_workflow_score'][i]
     const vals = indData.map(r => r[key] || 0)
     const avg = vals.length > 0 ? vals.reduce((a, b) => a + b, 0) / vals.length : 0
     return {
