@@ -8,6 +8,7 @@ export const ORG_PILLARS = [
       'AI is recognised by leadership as a key driver of innovation and competitive advantage.',
       'Senior leadership actively champions AI adoption within your organisation.',
       'Your organisation has a formal roadmap or plan for AI adoption over the next 2–3 years.',
+      'There is a designated executive sponsor or AI champion responsible for driving AI initiatives in your organisation.',
     ],
   },
   {
@@ -19,6 +20,7 @@ export const ORG_PILLARS = [
       'Relevant business data is accessible across departments when needed.',
       'Your organisation uses modern IT infrastructure such as cloud platforms or scalable computing.',
       'Your organisation has the computing capability required for advanced analytics or AI workloads.',
+      'Your organisation maintains data governance policies covering data usage ownership and access.',
     ],
   },
   {
@@ -30,6 +32,7 @@ export const ORG_PILLARS = [
       'Your organisation provides structured AI training or digital skills development programs.',
       'Managers are able to identify opportunities where AI can improve processes or decision-making.',
       'Your organisation encourages continuous learning and professional development in digital technologies.',
+      'Your organisation has a strategy for building future AI and digital capabilities in the workforce.',
     ],
   },
   {
@@ -41,6 +44,7 @@ export const ORG_PILLARS = [
       'Your organisation has identified specific business areas where AI could improve efficiency.',
       'Your organisation has conducted AI or advanced analytics pilot projects.',
       'AI tools are embedded into daily workflows or business applications in your organisation.',
+      'Your organisation has a process to evaluate and prioritise AI use cases based on business value.',
     ],
   },
   {
@@ -52,6 +56,7 @@ export const ORG_PILLARS = [
       'Your organisation complies with data protection regulations and privacy laws.',
       'Your organisation has processes to assess risks associated with AI systems.',
       'AI decisions in your organisation are designed to be transparent and explainable where appropriate.',
+      'Your organisation considers ethical implications when deploying AI systems.',
     ],
   },
 ]
@@ -69,7 +74,7 @@ export function computeOrgScores(responses) {
   for (let i = 1; i <= 5; i++) {
     const answers = responses[`pillar${i}`]
     const sum = answers.reduce((acc, v) => acc + (v || 0), 0)
-    const percentage = (sum / 20) * 100
+    const percentage = (sum / 25) * 100
     pillarScores.push({
       pillar: i,
       name: ORG_PILLARS[i - 1].name,
