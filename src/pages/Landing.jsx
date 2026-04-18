@@ -6,11 +6,10 @@ import { supabase, SESSION_CODE } from '../lib/supabase'
 
 const FULL_TEXT = 'AI Readiness\nAssessment'
 const CARD_GLASS = {
-  background: 'rgba(255,255,255,0.08)',
-  backdropFilter: 'blur(10px)',
-  WebkitBackdropFilter: 'blur(10px)',
-  border: '1px solid rgba(255,255,255,0.15)',
+  background: 'rgba(255,255,255,0.1)',
+  border: '1px solid rgba(255,255,255,0.2)',
   borderRadius: '20px',
+  boxShadow: '0 4px 24px rgba(0,0,0,0.2)',
   padding: '28px',
 }
 
@@ -68,7 +67,7 @@ function StatPill({ value, label }) {
 
 function PathCard({ icon, title, description, time, buttonText, badge, glow, buttonStyle, onClick }) {
   return (
-    <div className="relative flex flex-col" style={{ ...(glow ? { animation: 'glowPulse 2s ease-in-out infinite alternate', borderRadius: '20px' } : {}), ...CARD_GLASS }}>
+    <div className="relative flex flex-col" style={{ ...(glow ? { animation: 'glowPulse 2s ease-in-out infinite alternate', outline: '2px solid #00ADA9' } : {}), ...CARD_GLASS }}>
       {badge && (
         <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#00ADA9] text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
           {badge}
@@ -164,8 +163,8 @@ export default function Landing() {
       {/* Injected keyframes */}
       <style>{`
         @keyframes glowPulse {
-          from { box-shadow: 0 0 10px rgba(0,173,169,0.3); }
-          to   { box-shadow: 0 0 25px rgba(0,173,169,0.8); }
+          from { opacity: 0.7; }
+          to   { opacity: 1; }
         }
         @keyframes dotPulse {
           0%, 100% { opacity: 1; transform: scale(1); }
