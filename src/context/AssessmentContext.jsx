@@ -1,104 +1,112 @@
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useState, useCallback } from 'react'
 
 const AssessmentContext = createContext(null)
 
+function assignCluster(roleLevel, primaryFunction) {
+  const leaderRoles = ['C-Suite / Board (CEO, COO, CFO, CTO)', 'Director / VP']
+  if (leaderRoles.includes(roleLevel)) return 'A'
+
+  const map = {
+    'Strategy & Leadership': 'A',
+    'Human Resources & People': 'A',
+    'Finance & Accounting': 'A',
+    'Sales & Business Development': 'B',
+    'Operations & Process': 'B',
+    'Marketing & Branding': 'C',
+    'Technology & Digital': 'D',
+    'Product & Innovation': 'D',
+    'Learning & Development': 'E',
+    'Others': 'B',
+  }
+  return map[primaryFunction] || 'B'
+}
+
+const initialState = {
+  path: null,
+  intake: {
+    firstName: '',
+    organisation: '',
+    industry: '',
+    orgSize: '',
+    roleLevel: '',
+    primaryFunction: '',
+    email: '',
+    consent: false,
+    cluster: 'A',
+  },
+  orgResponses: Array(25).fill(null),
+  individualResponses: Array(15).fill(null),
+  orgResponseId: null,
+  individualResponseId: null,
+  orgScores: null,
+  individualScores: null,
+}
+
 export function AssessmentProvider({ children }) {
-  const [assessmentData, setAssessmentData] = useState({
-    // Path: 'org' | 'individual' | 'full'
-    path: null,
+  const [assessmentData, setAssessmentData] = useState(initialState)
 
-    // Intake form data
-    intake: {
-      firstName: '',
-      organisation: '',
-      industry: '',
-      orgSize: '',
-      roleLevel: '',
-      primaryFunction: '',
-      email: '',
-      consent: false,
-      cluster: null,
-    },
-
-    // Layer 1 org survey responses
-    orgResponses: {
-      // pillar1: [q1, q2, q3, q4]
-      pillar1: [null, null, null, null],
-      pillar2: [null, null, null, null],
-      pillar3: [null, null, null, null],
-      pillar4: [null, null, null, null],
-      pillar5: [null, null, null, null],
-    },
-
-    // Layer 1 computed scores
-    orgScores: null,
-
-    // Layer 2 individual responses
-    individualResponses: Array(10).fill(null),
-
-    // Layer 2 computed scores
-    individualScores: null,
-
-    // Supabase response IDs
-    orgResponseId: null,
-    individualResponseId: null,
-  })
-
-  const updateIntake = (data) => {
-    setAssessmentData(prev => ({
-      ...prev,
-      intake: { ...prev.intake, ...data },
-    }))
-  }
-
-  const setPath = (path) => {
+  const setPath = useCallback((path) => {
     setAssessmentData(prev => ({ ...prev, path }))
-  }
+  }, [])
 
-  const updateOrgResponses = (pillar, questionIndex, score) => {
+  const updateIntake = useCallback((data) => {
     setAssessmentData(prev => {
-      const updated = { ...prev.orgResponses }
-      updated[`pillar${pillar}`] = [...updated[`pillar${pillar}`]]
-      updated[`pillar${pillar}`][questionIndex] = score
+      const updatedIntake = { ...prev.intake, ...data }
+      if ('roleLevel' in data || 'primaryFunction' in data) {
+        updatedIntake.cluster = assignCluster(updatedIntake.roleLevel, updatedIntake.primaryFunction)
+      }
+      return { ...prev, intake: updatedIntake }
+    })
+  }, [])
+
+  const updateOrgResponse = useCallback((index, value) => {
+    setAssessmentData(prev => {
+      const updated = [...prev.orgResponses]
+      updated[index] = value
       return { ...prev, orgResponses: updated }
     })
-  }
+  }, [])
 
-  const setOrgScores = (scores) => {
-    setAssessmentData(prev => ({ ...prev, orgScores: scores }))
-  }
-
-  const updateIndividualResponse = (index, value) => {
+  const updateIndividualResponse = useCallback((index, value) => {
     setAssessmentData(prev => {
       const updated = [...prev.individualResponses]
       updated[index] = value
       return { ...prev, individualResponses: updated }
     })
-  }
+  }, [])
 
-  const setIndividualScores = (scores) => {
+  const setOrgScores = useCallback((scores) => {
+    setAssessmentData(prev => ({ ...prev, orgScores: scores }))
+  }, [])
+
+  const setIndividualScores = useCallback((scores) => {
     setAssessmentData(prev => ({ ...prev, individualScores: scores }))
-  }
+  }, [])
 
-  const setOrgResponseId = (id) => {
+  const setOrgResponseId = useCallback((id) => {
     setAssessmentData(prev => ({ ...prev, orgResponseId: id }))
-  }
+  }, [])
 
-  const setIndividualResponseId = (id) => {
+  const setIndividualResponseId = useCallback((id) => {
     setAssessmentData(prev => ({ ...prev, individualResponseId: id }))
-  }
+  }, [])
+
+  const resetAssessment = useCallback(() => {
+    setAssessmentData(initialState)
+  }, [])
 
   return (
     <AssessmentContext.Provider value={{
       assessmentData,
       setPath,
       updateIntake,
-      updateOrgResponses,
-      setOrgScores,
+      updateOrgResponse,
       updateIndividualResponse,
+      setOrgScores,
       setIndividualScores,
       setOrgResponseId,
       setIndividualResponseId,
+      resetAssessment,
     }}>
       {children}
     </AssessmentContext.Provider>
