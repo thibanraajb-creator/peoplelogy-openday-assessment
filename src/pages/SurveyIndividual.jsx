@@ -197,6 +197,14 @@ export default function SurveyIndividual() {
     console.log('[SurveyIndividual] Result:', data, error)
 
     if (error) {
+      console.error('[SurveyIndividual] FULL ERROR:', JSON.stringify({
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint,
+        status: error.status
+      }))
+      alert('Error: ' + error.message + ' | Code: ' + error.code + ' | Details: ' + error.details + ' | Hint: ' + error.hint)
       setSaveError('Save error: ' + error.message + ' | Code: ' + error.code)
       setSaving(false)
       navigate('/results')
