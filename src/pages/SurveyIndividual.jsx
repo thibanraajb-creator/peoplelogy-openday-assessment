@@ -5,8 +5,7 @@ import { CLUSTER_QUESTIONS, computeIndividualScores } from '../data/individualQu
 import { supabase, SESSION_CODE } from '../lib/supabase'
 import Logo from '../components/Logo'
 
-// Target table: openday_individual_capability
-const INDIVIDUAL_TABLE = 'openday_individual_capability'
+// ── Answer input components ───────────────────────────────────────────────────
 
 function SingleSelect({ options, selected, onSelect }) {
   return (
@@ -56,7 +55,7 @@ function MultiSelect({ options, selected, onToggle, maxSelect }) {
                 : 'border-gray-200 bg-white text-gray-700 hover:border-[#00ADA9]/40 hover:bg-gray-50'
               }`}
           >
-            <span className={`inline-flex items-center justify-center w-5 h-5 rounded border-2 mr-3 transition-colors
+            <span className={`inline-flex items-center justify-center w-5 h-5 rounded border-2 mr-3 transition-colors flex-shrink-0
               ${isSelected ? 'bg-[#00ADA9] border-[#00ADA9]' : 'border-gray-300'}`}>
               {isSelected && (
                 <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -79,65 +78,58 @@ function OpenText({ value, onChange, placeholder }) {
       onChange={e => onChange(e.target.value)}
       placeholder={placeholder || 'Type your answer here...'}
       rows={4}
-      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00ADA9] focus:border-transparent transition-all duration-200 text-gray-800 resize-none text-sm"
+      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#00ADA9] focus:border-transparent outline-none text-gray-800 resize-none text-sm transition-all duration-200"
     />
   )
 }
 
+// ── Page ─────────────────────────────────────────────────────────────────────
+
 export default function SurveyIndividual() {
   const navigate = useNavigate()
-  const {
-    assessmentData,
-    updateIndividualResponse,
-    setIndividualScores,
-    setIndividualResponseId,
-  } = useAssessment()
+  const { assessmentData, setIndividualScores, setIndividualResponseId } = useAssessment()
 
-  const { path, intake, orgResponseId, individualResponses } = assessmentData
-  const cluster = intake.cluster || 'A'
+  const cluster   = assessmentData.intake.cluster || 'A'
   const questions = CLUSTER_QUESTIONS[cluster] || CLUSTER_QUESTIONS.A
 
-  const [currentQ, setCurrentQ] = useState(0)
-  const [saving, setSaving] = useState(false)
-  const [saveError, setSaveError] = useState(null)
+  const [responses,  setResponses]  = useState(Array(15).fill(null))
+  const [currentQ,   setCurrentQ]   = useState(0)
+  const [saving,     setSaving]     = useState(false)
+  const [saveError,  setSaveError]  = useState(null)
 
   useEffect(() => {
-    if (!intake.firstName) navigate('/')
-  }, [intake.firstName, navigate])
+    if (!assessmentData.intake.firstName) navigate('/')
+  }, [assessmentData.intake.firstName, navigate])
 
   const question = questions[currentQ]
-  const response = individualResponses[currentQ]
-  const isLast = currentQ === questions.length - 1
+  const response = responses[currentQ]
+  const isLast   = currentQ === questions.length - 1
 
   const isAnswered = () => {
     if (question.type === 'single_select') return response !== null && response !== undefined
-    if (question.type === 'multi_select') return Array.isArray(response) && response.length > 0
-    if (question.type === 'open_text') return typeof response === 'string' && response.trim().length > 0
+    if (question.type === 'multi_select')  return Array.isArray(response) && response.length > 0
+    if (question.type === 'open_text')     return true   // optional
     return false
   }
 
-  const handleSingleSelect = (index) => {
-    updateIndividualResponse(currentQ, index)
+  const setResponse = (value) => {
+    setResponses(prev => {
+      const next = [...prev]
+      next[currentQ] = value
+      return next
+    })
     setSaveError(null)
   }
 
-  const handleMultiToggle = (index) => {
+  const handleMultiToggle = (idx) => {
     const current = Array.isArray(response) ? response : []
-    if (current.includes(index)) {
-      updateIndividualResponse(currentQ, current.filter(i => i !== index))
+    if (current.includes(idx)) {
+      setResponse(current.filter(i => i !== idx))
+    } else if (question.maxSelect && current.length >= question.maxSelect) {
+      setResponse([...current.slice(1), idx])
     } else {
-      if (question.maxSelect && current.length >= question.maxSelect) {
-        updateIndividualResponse(currentQ, [...current.slice(1), index])
-      } else {
-        updateIndividualResponse(currentQ, [...current, index])
-      }
+      setResponse([...current, idx])
     }
-    setSaveError(null)
-  }
-
-  const handleOpenText = (text) => {
-    updateIndividualResponse(currentQ, text)
-    setSaveError(null)
   }
 
   const handleNext = async () => {
@@ -149,151 +141,119 @@ export default function SurveyIndividual() {
       return
     }
 
-    // Final question — compute scores and save to openday_individual_capability
+    // ── Save logic ────────────────────────────────────────────────────────────
     setSaving(true)
     setSaveError(null)
 
-    try {
-      // Compute dimension and capability scores from all 10 answers
-      const scores = computeIndividualScores(individualResponses, cluster)
-      setIndividualScores(scores)
+    const scores = computeIndividualScores(responses, cluster)
+    setIndividualScores(scores)
 
-      // Build l2_q1 through l2_q10 answer text fields
-      const answerFields = {}
-      individualResponses.forEach((r, i) => {
-        const q = questions[i]
-        if (r === null || r === undefined) {
-          answerFields[`l2_q${i + 1}`] = null
-        } else if (Array.isArray(r)) {
-          // multi_select: store selected option texts joined
-          const texts = r.map(idx => q.options?.[idx]?.text || String(idx))
-          answerFields[`l2_q${i + 1}`] = texts.join(', ')
-        } else if (typeof r === 'number') {
-          // single_select: store the selected option text
-          answerFields[`l2_q${i + 1}`] = q.options?.[r]?.text || String(r)
-        } else {
-          // open_text: store raw string
-          answerFields[`l2_q${i + 1}`] = String(r)
-        }
-      })
-
-      // Build the full payload for openday_individual_capability
-      const payload = {
-        // For full path: links to the org response row via UUID
-        // For individual-only path: null (no org response exists)
-        response_id: orgResponseId || null,
-
-        // Participant details from intake form
-        first_name: intake.firstName,
-        organisation: intake.organisation,
-        industry: intake.industry,
-        role_level: intake.roleLevel,
-        cluster,                        // A | B | C | D | E
-
-        // Session metadata
-        session_code: SESSION_CODE,     // 'JBOPEN2026'
-        cycle: 1,
-
-        // Dimension scores (1–4 scale averages)
-        d1_awareness_score: scores.dimensionAverages.D1,
-        d2_tool_use_score: scores.dimensionAverages.D2,
-        d3_prompt_ability_score: scores.dimensionAverages.D3,
-        d4_opportunity_score: scores.dimensionAverages.D4,
-        d5_workflow_score: scores.dimensionAverages.D5,
-
-        // Overall capability score (1–4 scale average)
-        overall_capability_score: scores.overallAverage,
-
-        // Derived labels and learning focus
-        capability_label: scores.capabilityLabel,
-        primary_learning_focus: scores.primaryLearningFocus,
-        secondary_learning_focus: scores.secondaryLearningFocus,
-        is_champion: scores.isChampion,
-
-        // Raw answer text for all 10 questions (l2_q1 – l2_q10)
-        ...answerFields,
+    const answerFields = {}
+    questions.forEach((q, i) => {
+      const r = responses[i]
+      if (r === null || r === undefined) {
+        answerFields['l2_q' + (i + 1)] = null
+      } else if (Array.isArray(r)) {
+        answerFields['l2_q' + (i + 1)] = r.map(idx => q.options?.[idx]?.text || String(idx)).join(', ')
+      } else if (typeof r === 'number') {
+        answerFields['l2_q' + (i + 1)] = q.options?.[r]?.text || String(r)
+      } else {
+        answerFields['l2_q' + (i + 1)] = String(r)
       }
+    })
 
-      // INSERT into openday_individual_capability (NOT openday_sessions)
-      const { data, error } = await supabase
-        .from(INDIVIDUAL_TABLE)
-        .insert(payload)
-        .select('id')
-        .single()
-
-      if (error) {
-        // Surface the Supabase error so it can be diagnosed
-        console.error('[SurveyIndividual] Supabase insert error:', error)
-        setSaveError(`Could not save your responses: ${error.message}. Your results will still be shown, but may not be recorded.`)
-        // Still navigate so the user sees their results — scores are held in React state
-        navigate('/results')
-        return
-      }
-
-      if (data?.id) {
-        setIndividualResponseId(data.id)
-        console.log('[SurveyIndividual] Saved to', INDIVIDUAL_TABLE, 'with id:', data.id, '| response_id (org link):', payload.response_id)
-      }
-    } catch (err) {
-      console.error('[SurveyIndividual] Unexpected error:', err)
-      setSaveError('An unexpected error occurred. Your results will still be shown.')
-    } finally {
-      setSaving(false)
+    const payload = {
+      response_id:              assessmentData.orgResponseId || null,
+      first_name:               assessmentData.intake.firstName,
+      organisation:             assessmentData.intake.organisation,
+      industry:                 assessmentData.intake.industry,
+      role_level:               assessmentData.intake.roleLevel,
+      cluster,
+      session_code:             SESSION_CODE,
+      cycle:                    1,
+      submitted_at:             new Date().toISOString(),
+      d1_awareness_score:       scores.dimensionAverages.D1,
+      d2_tool_score:            scores.dimensionAverages.D2,
+      d3_prompt_score:          scores.dimensionAverages.D3,
+      d4_opportunity_score:     scores.dimensionAverages.D4,
+      d5_workflow_score:        scores.dimensionAverages.D5,
+      overall_capability_score: scores.overallAverage,
+      capability_label:         scores.capabilityLabel,
+      primary_learning_focus:   scores.primaryLearningFocus,
+      secondary_learning_focus: scores.secondaryLearningFocus,
+      is_champion:              scores.isChampion,
+      ...answerFields,
     }
 
+    console.log('[SurveyIndividual] Inserting payload:', JSON.stringify(payload))
+
+    const { data, error } = await supabase
+      .from('openday_individual_capability')
+      .insert([payload])
+      .select('id')
+      .single()
+
+    console.log('[SurveyIndividual] Result:', data, error)
+
+    if (error) {
+      setSaveError('Save error: ' + error.message + ' | Code: ' + error.code)
+      setSaving(false)
+      navigate('/results')
+      return
+    }
+
+    if (data?.id) {
+      setIndividualResponseId(data.id)
+    }
+
+    setSaving(false)
     navigate('/results')
   }
 
-  const handleBack = () => {
-    if (currentQ > 0) {
-      setCurrentQ(prev => prev - 1)
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-    }
-  }
+  const progressPct = Math.round((currentQ / 15) * 100)
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
+
+      {/* Navbar */}
       <div className="bg-[#1B3A5C] px-6 py-4">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <Logo />
-          <span className="text-white/60 text-sm hidden sm:block">Personal AI Capability</span>
+          <span className="text-white/60 text-sm">Personal AI Capability</span>
         </div>
       </div>
 
-      {/* Progress */}
+      {/* Progress bar — sticky */}
       <div className="bg-white border-b border-gray-100 sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-6 py-3">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold text-[#00ADA9]">
-              Question {currentQ + 1} of {questions.length}
+              Question {currentQ + 1} of 15
             </span>
-            <span className="text-xs text-gray-500">{Math.round((currentQ / questions.length) * 100)}% complete</span>
+            <span className="text-xs text-gray-500">{progressPct}%</span>
           </div>
-          <div className="w-full bg-gray-100 rounded-full h-2">
+          <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
             <div
-              className="bg-[#00ADA9] h-2 rounded-full transition-all duration-500"
-              style={{ width: `${(currentQ / questions.length) * 100}%` }}
+              className="h-full rounded-full transition-all duration-500"
+              style={{ width: `${progressPct}%`, backgroundColor: '#00ADA9' }}
             />
           </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="max-w-2xl mx-auto px-6 py-8 fade-in">
+      <div className="max-w-2xl mx-auto px-6 py-8">
+
         {/* Question badge */}
         <div className="mb-6">
-          <span className="inline-flex items-center gap-1.5 bg-[#E6FAF9] text-[#00ADA9] text-xs font-bold px-3 py-1.5 rounded-full">
-            Q{currentQ + 1} of {questions.length}
+          <span className="inline-flex items-center bg-[#E6FAF9] text-[#00ADA9] text-xs font-bold px-3 py-1.5 rounded-full">
+            Q{currentQ + 1} of 15
           </span>
         </div>
 
         {/* Save error banner */}
         {saveError && (
-          <div className="mb-4 bg-red-50 border border-red-200 rounded-xl px-4 py-3 flex items-start gap-3">
-            <svg className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+          <div className="mb-4 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
             <p className="text-red-700 text-xs">{saveError}</p>
           </div>
         )}
@@ -308,7 +268,7 @@ export default function SurveyIndividual() {
             <SingleSelect
               options={question.options}
               selected={response}
-              onSelect={handleSingleSelect}
+              onSelect={(i) => setResponse(i)}
             />
           )}
 
@@ -324,7 +284,7 @@ export default function SurveyIndividual() {
           {question.type === 'open_text' && (
             <OpenText
               value={response}
-              onChange={handleOpenText}
+              onChange={(v) => setResponse(v)}
               placeholder={question.placeholder}
             />
           )}
@@ -334,27 +294,20 @@ export default function SurveyIndividual() {
         <div className="flex items-center gap-4">
           <button
             type="button"
-            onClick={handleBack}
+            onClick={() => { setCurrentQ(prev => prev - 1); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
             disabled={currentQ === 0}
-            className={`flex items-center gap-2 font-medium py-3 px-4 rounded-xl border transition-colors
-              ${currentQ === 0
-                ? 'border-gray-100 text-gray-300 cursor-not-allowed'
-                : 'border-gray-200 text-gray-500 hover:text-[#1B3A5C] hover:border-gray-300'
-              }`}
+            className="border border-gray-200 text-gray-500 rounded-xl px-4 py-3 disabled:opacity-40 disabled:cursor-not-allowed hover:border-gray-300 transition-colors"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Back
+            ← Back
           </button>
 
           <button
             type="button"
             onClick={handleNext}
             disabled={!isAnswered() || saving}
-            className={`flex-1 flex items-center justify-center gap-2 font-bold py-4 px-6 rounded-xl transition-all duration-200 text-base
+            className={`flex-1 flex items-center justify-center gap-2 font-bold py-4 rounded-xl transition-all duration-200 text-base
               ${isAnswered() && !saving
-                ? 'bg-[#00ADA9] hover:bg-[#008a87] text-white shadow-md'
+                ? 'bg-[#00ADA9] hover:bg-[#008a87] text-white'
                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'
               }`}
           >
@@ -364,7 +317,7 @@ export default function SurveyIndividual() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
-                Saving...
+                Saving…
               </>
             ) : isLast ? (
               <>
@@ -374,15 +327,11 @@ export default function SurveyIndividual() {
                 </svg>
               </>
             ) : (
-              <>
-                Next
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </>
+              'Next →'
             )}
           </button>
         </div>
+
       </div>
     </div>
   )
