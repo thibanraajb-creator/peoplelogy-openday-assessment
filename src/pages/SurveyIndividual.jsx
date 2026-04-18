@@ -186,10 +186,11 @@ export default function SurveyIndividual() {
     }
 
     console.log('[SurveyIndividual] Inserting payload:', JSON.stringify(payload))
+    console.log('[DEBUG] Full payload being sent:', JSON.stringify(payload, null, 2))
 
     const { data, error } = await supabase
       .from('openday_individual_capability')
-      .insert([payload])
+      .insert(payload)
       .select('id')
       .single()
 
