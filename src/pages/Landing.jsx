@@ -10,7 +10,9 @@ const CARD_GLASS = {
   border: '1px solid rgba(255,255,255,0.2)',
   borderRadius: '20px',
   boxShadow: '0 4px 24px rgba(0,0,0,0.2)',
-  padding: '28px',
+  padding: '36px',
+  minHeight: '320px',
+  transition: 'transform 300ms ease',
 }
 
 // ── Icons ────────────────────────────────────────────────────────────────────
@@ -67,13 +69,18 @@ function StatPill({ value, label }) {
 
 function PathCard({ icon, title, description, time, buttonText, badge, glow, buttonStyle, onClick }) {
   return (
-    <div className="relative flex flex-col" style={{ ...(glow ? { animation: 'glowPulse 2s ease-in-out infinite alternate', outline: '2px solid #00ADA9' } : {}), ...CARD_GLASS }}>
+    <div
+      className="relative flex flex-col"
+      style={{ ...(glow ? { animation: 'glowPulse 2s ease-in-out infinite alternate', outline: '2px solid #00ADA9' } : {}), ...CARD_GLASS }}
+      onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.03)'}
+      onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+    >
       {badge && (
-        <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#00ADA9] text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
+        <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#00ADA9] text-white text-sm font-bold px-4 py-1.5 rounded-full whitespace-nowrap">
           {badge}
         </span>
       )}
-      <div className="flex items-center justify-center w-14 h-14 bg-[#00ADA9]/20 rounded-xl mb-5">
+      <div className="flex items-center justify-center w-16 h-16 bg-[#00ADA9]/20 rounded-xl mb-5">
         {icon}
       </div>
       <h3 className="text-white font-bold text-xl mb-3">{title}</h3>
@@ -85,7 +92,7 @@ function PathCard({ icon, title, description, time, buttonText, badge, glow, but
       </div>
       <button
         onClick={onClick}
-        className="w-full font-bold py-3 rounded-xl transition-colors duration-200 text-white text-sm"
+        className="w-full font-bold py-3 rounded-xl transition-colors duration-200 text-white text-base"
         style={buttonStyle}
       >
         {buttonText}
@@ -166,6 +173,11 @@ export default function Landing() {
           from { opacity: 0.7; }
           to   { opacity: 1; }
         }
+        @keyframes heroGradient {
+          0%   { background-position: 0% 50%; }
+          50%  { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
         @keyframes dotPulse {
           0%, 100% { opacity: 1; transform: scale(1); }
           50%       { opacity: 0.4; transform: scale(0.7); }
@@ -179,7 +191,14 @@ export default function Landing() {
       </nav>
 
       {/* Hero */}
-      <section className="max-w-6xl mx-auto px-6 pt-8 pb-10">
+      <section
+        className="max-w-6xl mx-auto px-6 pt-8 pb-10"
+        style={{
+          background: 'radial-gradient(ellipse at 20% 50%, rgba(0,173,169,0.12) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(0,173,169,0.08) 0%, transparent 50%)',
+          backgroundSize: '200% 200%',
+          animation: 'heroGradient 8s ease infinite',
+        }}
+      >
         <div className="flex items-center gap-8">
 
           {/* Left column */}
@@ -240,6 +259,9 @@ export default function Landing() {
 
         </div>
       </section>
+
+      {/* Divider */}
+      <div className="max-w-6xl mx-auto px-6 my-5 border-t border-white/10" />
 
       {/* Path cards */}
       <section className="max-w-6xl mx-auto px-6 pb-16">

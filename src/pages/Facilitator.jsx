@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase, SESSION_CODE } from '../lib/supabase'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, Cell, ResponsiveContainer,
@@ -22,6 +23,7 @@ function BigStat({ value, label, color = '#00ADA9' }) {
 }
 
 export default function Facilitator() {
+  const navigate = useNavigate()
   const [orgData, setOrgData] = useState([])
   const [indData, setIndData] = useState([])
   const [loading, setLoading] = useState(false)
@@ -128,9 +130,19 @@ export default function Facilitator() {
   return (
     <div className="min-h-screen bg-[#0f1f35] text-white" style={{ fontFamily: 'Inter, sans-serif' }}>
       <div className="flex items-center justify-between px-8 py-5 border-b border-white/10">
-        <span className="font-black text-2xl">
-          PEOPLE<span style={{ color: '#00ADA9' }}>logy</span>
-        </span>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => navigate('/')}
+            className="bg-white/10 hover:bg-white/20 text-white rounded-lg p-2 flex items-center gap-2 text-sm font-medium"
+          >
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+          </button>
+          <span className="font-black text-2xl">
+            PEOPLE<span style={{ color: '#00ADA9' }}>logy</span>
+          </span>
+        </div>
         <span className="text-white/70 text-lg font-semibold">Open Day JB · 5 May 2026</span>
         <div className="flex items-center gap-4">
           {lastUpdated && (
