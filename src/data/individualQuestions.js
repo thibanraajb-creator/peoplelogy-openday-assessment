@@ -449,11 +449,211 @@ const CLUSTER_B = [
   },
 ]
 
+// ─── CLUSTER C ────────────────────────────────────────────────────────────────
+
+const CLUSTER_C = [
+  {
+    id: 1,
+    dimension: 'D2',
+    type: 'multi_select',
+    question: 'Which AI tools do you currently use for creative or marketing work?',
+    options: [
+      { text: 'Claude' },
+      { text: 'ChatGPT' },
+      { text: 'Adobe Firefly' },
+      { text: 'Canva AI' },
+      { text: 'Copilot' },
+      { text: 'None' },
+      { text: 'Other' },
+    ],
+    scoreLogic: (selectedTexts) => {
+      if (selectedTexts.includes('None') && selectedTexts.length === 1) return 1
+      const validCount = selectedTexts.filter(t => t !== 'None').length
+      if (validCount >= 3) return 4
+      if (validCount === 2) return 3
+      if (validCount === 1) return 2
+      return 1
+    },
+  },
+  {
+    id: 2,
+    dimension: 'D3',
+    type: 'single_select',
+    question: 'You need 10 social media posts for the month. How do you use AI?',
+    options: [
+      { text: 'Generate all 10 and post directly without editing', score: 2 },
+      { text: 'Generate drafts with brand context, edit each one', score: 4 },
+      { text: 'Use AI for ideas only, write manually', score: 2 },
+      { text: 'I do not use AI for this', score: 1 },
+    ],
+  },
+  {
+    id: 3,
+    dimension: 'D5',
+    type: 'single_select',
+    question: 'Has AI changed how you produce content in the last 3 months?',
+    options: [
+      { text: 'Yes, significantly faster and better quality', score: 4 },
+      { text: 'Yes, some improvement', score: 3 },
+      { text: 'Minimal change', score: 2 },
+      { text: 'Not yet', score: 1 },
+    ],
+  },
+  {
+    id: 4,
+    dimension: 'D1',
+    type: 'single_select',
+    question: 'AI-generated content goes out and receives criticism for being generic. What went wrong?',
+    options: [
+      { text: 'The prompt lacked brand voice and audience context', score: 4 },
+      { text: 'AI is not good enough for creative work yet', score: 1 },
+      { text: 'The reviewer should have caught it before publishing', score: 2 },
+      { text: 'AI-generated content is always generic', score: 1 },
+    ],
+  },
+  {
+    id: 5,
+    dimension: 'D3',
+    type: 'single_select',
+    question: 'When prompting AI for creative content, how do you ensure it matches your brand voice?',
+    options: [
+      { text: 'I include brand guidelines and tone examples in the prompt', score: 4 },
+      { text: 'I edit the output to match tone after generating', score: 3 },
+      { text: 'I do not, I adjust manually after', score: 2 },
+      { text: 'I am not sure how to do this', score: 1 },
+    ],
+  },
+  {
+    id: 6,
+    dimension: 'D4',
+    type: 'multi_select',
+    question: 'Which tasks in your role take most time but could be AI-assisted? Select top 2.',
+    options: [
+      { text: 'Writing copy' },
+      { text: 'Creating visuals' },
+      { text: 'Monthly reporting' },
+      { text: 'Campaign planning' },
+      { text: 'Social media scheduling' },
+      { text: 'Email drafting' },
+    ],
+    maxSelect: 2,
+    scoreLogic: (selectedTexts) => {
+      if (selectedTexts.length >= 2) return 4
+      if (selectedTexts.length === 1) return 2
+      return 1
+    },
+  },
+  {
+    id: 7,
+    dimension: 'D2',
+    type: 'single_select',
+    question: 'How often do you use AI image or visual generation tools in your work?',
+    options: [
+      { text: 'Daily', score: 4 },
+      { text: 'Weekly', score: 3 },
+      { text: 'Occasionally', score: 2 },
+      { text: 'Never used one', score: 1 },
+    ],
+  },
+  {
+    id: 8,
+    dimension: 'D5',
+    type: 'open_text',
+    question: 'Describe the last time you used AI to complete a creative task faster than manually. Type "not yet" if you have not.',
+    placeholder: 'Describe the experience or type "not yet"...',
+  },
+  {
+    id: 9,
+    dimension: 'D1',
+    type: 'single_select',
+    question: 'You are about to use AI to generate an image for a client campaign. What do you check first?',
+    options: [
+      { text: 'Copyright status and data classification', score: 4 },
+      { text: 'Whether the prompt quality is good', score: 3 },
+      { text: 'Client approval', score: 2 },
+      { text: 'Nothing, I just use it', score: 1 },
+    ],
+  },
+  {
+    id: 10,
+    dimension: 'D4',
+    type: 'single_select',
+    question: 'If an AI tool could auto-generate your monthly content calendar from a brief, how would you use it?',
+    options: [
+      { text: 'Use it directly as the final calendar', score: 2 },
+      { text: 'Use it as a strong starting draft to refine', score: 4 },
+      { text: 'Use it only for initial ideas', score: 3 },
+      { text: 'I would not trust it', score: 1 },
+    ],
+  },
+  {
+    id: 11,
+    dimension: 'D3',
+    type: 'single_select',
+    question: 'How do you brief AI when creating a campaign concept for a new product launch?',
+    options: [
+      { text: 'Target audience, key message, tone, format and examples of good campaigns', score: 4 },
+      { text: 'Describe the product and ask for ideas', score: 3 },
+      { text: 'Ask for a generic campaign idea', score: 2 },
+      { text: 'I do not use AI for campaign concepting', score: 1 },
+    ],
+  },
+  {
+    id: 12,
+    dimension: 'D2',
+    type: 'single_select',
+    question: 'How often do you use AI to repurpose content across different formats?',
+    options: [
+      { text: 'Regularly, it is part of my workflow', score: 4 },
+      { text: 'Sometimes', score: 3 },
+      { text: 'Rarely', score: 2 },
+      { text: 'Never', score: 1 },
+    ],
+  },
+  {
+    id: 13,
+    dimension: 'D5',
+    type: 'single_select',
+    question: 'Has your content output volume increased because of AI tools in the last 3 months?',
+    options: [
+      { text: 'Yes, significantly more output', score: 4 },
+      { text: 'Yes, slightly more', score: 3 },
+      { text: 'Same volume', score: 2 },
+      { text: 'I have not used AI for content yet', score: 1 },
+    ],
+  },
+  {
+    id: 14,
+    dimension: 'D1',
+    type: 'single_select',
+    question: 'How do you ensure AI-generated content is accurate and not misleading before publishing?',
+    options: [
+      { text: 'I always fact-check, edit for accuracy and have it reviewed', score: 4 },
+      { text: 'I read through it carefully before publishing', score: 3 },
+      { text: 'I trust the AI output and publish directly', score: 1 },
+      { text: 'I only use AI for visuals, not written content', score: 2 },
+    ],
+  },
+  {
+    id: 15,
+    dimension: 'D4',
+    type: 'single_select',
+    question: 'Which AI capability would create the most value in your marketing or creative role?',
+    options: [
+      { text: 'Automated content calendar generation', score: 3 },
+      { text: 'AI-powered audience targeting and personalisation', score: 4 },
+      { text: 'Visual and image generation', score: 3 },
+      { text: 'I am not sure yet', score: 2 },
+    ],
+  },
+]
+
 // ─── Exports ──────────────────────────────────────────────────────────────────
 
 export const CLUSTER_QUESTIONS = {
   A: CLUSTER_A,
   B: CLUSTER_B,
+  C: CLUSTER_C,
 }
 
 // ─── Scoring ──────────────────────────────────────────────────────────────────
