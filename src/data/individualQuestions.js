@@ -840,6 +840,196 @@ const CLUSTER_D = [
   },
 ]
 
+// ─── CLUSTER E ────────────────────────────────────────────────────────────────
+
+const CLUSTER_E = [
+  {
+    id: 1,
+    dimension: 'D2',
+    type: 'single_select',
+    question: 'Do you use AI to help design, write or improve training content or facilitation materials?',
+    options: [
+      { text: 'Yes, regularly', score: 4 },
+      { text: 'Occasionally', score: 3 },
+      { text: 'Tried it once', score: 2 },
+      { text: 'Never', score: 1 },
+    ],
+  },
+  {
+    id: 2,
+    dimension: 'D3',
+    type: 'single_select',
+    question: 'You need to create a session plan for a leadership workshop. How do you use AI?',
+    options: [
+      { text: 'Ask AI to generate a full plan with no context', score: 2 },
+      { text: 'Give AI the objectives, audience and format, then refine', score: 4 },
+      { text: 'Use AI for activity ideas only, write the plan manually', score: 2 },
+      { text: 'I do not use AI for session planning', score: 1 },
+    ],
+  },
+  {
+    id: 3,
+    dimension: 'D4',
+    type: 'multi_select',
+    question: 'Which part of your L&D role could AI most meaningfully improve?',
+    options: [
+      { text: 'Content writing' },
+      { text: 'Assessment design' },
+      { text: 'Participant communication' },
+      { text: 'Post-programme reports' },
+      { text: 'Facilitation prep' },
+      { text: 'None' },
+    ],
+    scoreLogic: (selectedTexts) => {
+      if (selectedTexts.includes('None') && selectedTexts.length === 1) return 1
+      const validCount = selectedTexts.filter(t => t !== 'None').length
+      if (validCount >= 3) return 4
+      if (validCount === 2) return 3
+      if (validCount === 1) return 2
+      return 1
+    },
+  },
+  {
+    id: 4,
+    dimension: 'D1',
+    type: 'single_select',
+    question: 'A participant asks during a workshop whether AI will replace their job. How confident are you answering clearly?',
+    options: [
+      { text: 'Very confident, I have a clear and balanced answer', score: 4 },
+      { text: 'Somewhat confident', score: 3 },
+      { text: 'Not very confident', score: 2 },
+      { text: 'Not at all confident', score: 1 },
+    ],
+  },
+  {
+    id: 5,
+    dimension: 'D5',
+    type: 'single_select',
+    question: 'Have you used AI to generate or improve a post-programme report in the last 3 months?',
+    options: [
+      { text: 'Yes', score: 4 },
+      { text: 'No, but I am planning to', score: 2 },
+      { text: 'No', score: 1 },
+      { text: 'I did not know I could do this', score: 1 },
+    ],
+  },
+  {
+    id: 6,
+    dimension: 'D3',
+    type: 'single_select',
+    question: 'You want AI to write 5 scenario-based assessment questions for a leadership module. What do you include in your prompt?',
+    options: [
+      { text: 'Module topic, learning objectives, audience and desired format', score: 4 },
+      { text: 'Just the module topic', score: 2 },
+      { text: 'The full module content without structure', score: 2 },
+      { text: 'I would not know what to include', score: 1 },
+    ],
+  },
+  {
+    id: 7,
+    dimension: 'D2',
+    type: 'single_select',
+    question: 'Have you used Copilot in Word or PowerPoint to speed up building training decks?',
+    options: [
+      { text: 'Yes, regularly', score: 4 },
+      { text: 'Tried it a few times', score: 3 },
+      { text: 'I know it exists but have not tried it', score: 2 },
+      { text: 'I was not aware of this feature', score: 1 },
+    ],
+  },
+  {
+    id: 8,
+    dimension: 'D4',
+    type: 'single_select',
+    question: 'How much of your content writing could realistically be first-drafted by AI?',
+    options: [
+      { text: 'Most of it', score: 4 },
+      { text: 'About half', score: 3 },
+      { text: 'A small portion only', score: 2 },
+      { text: 'None, it needs to be fully human-written', score: 1 },
+    ],
+  },
+  {
+    id: 9,
+    dimension: 'D1',
+    type: 'single_select',
+    question: 'A client asks whether their programme content was AI-generated. What is the right response?',
+    options: [
+      { text: 'Be transparent and explain the AI-assisted process and governance', score: 4 },
+      { text: 'Avoid confirming or denying', score: 1 },
+      { text: 'Say no', score: 1 },
+      { text: 'It depends on the client relationship', score: 2 },
+    ],
+  },
+  {
+    id: 10,
+    dimension: 'D5',
+    type: 'open_text',
+    question: 'If you had 1 hour per week to learn AI tools for your L&D role, what would you focus on first?',
+    placeholder: 'Describe what you would focus on...',
+  },
+  {
+    id: 11,
+    dimension: 'D3',
+    type: 'single_select',
+    question: 'How do you currently use AI to personalise learning experiences for different participant groups?',
+    options: [
+      { text: 'I use AI to create tailored content variants for different roles and levels', score: 4 },
+      { text: 'I use AI to suggest personalisation ideas, then implement manually', score: 3 },
+      { text: 'I do not personalise, one version for all', score: 2 },
+      { text: 'I have not thought about using AI for personalisation', score: 1 },
+    ],
+  },
+  {
+    id: 12,
+    dimension: 'D2',
+    type: 'single_select',
+    question: 'How often do you use AI to generate icebreakers, activities or energisers for your training sessions?',
+    options: [
+      { text: 'Regularly, AI is part of my session design toolkit', score: 4 },
+      { text: 'Occasionally', score: 3 },
+      { text: 'Rarely', score: 2 },
+      { text: 'Never', score: 1 },
+    ],
+  },
+  {
+    id: 13,
+    dimension: 'D5',
+    type: 'single_select',
+    question: 'Have you built any AI-assisted learning tools or resources for your participants in the last 6 months?',
+    options: [
+      { text: 'Yes, multiple', score: 4 },
+      { text: 'Yes, one', score: 3 },
+      { text: 'Planning to', score: 2 },
+      { text: 'No', score: 1 },
+    ],
+  },
+  {
+    id: 14,
+    dimension: 'D1',
+    type: 'single_select',
+    question: 'How confident are you facilitating a session specifically about AI literacy for non-technical staff?',
+    options: [
+      { text: 'Very confident, I have done it before', score: 4 },
+      { text: 'Fairly confident, I could prepare and deliver it', score: 3 },
+      { text: 'Not very confident, I would need support', score: 2 },
+      { text: 'Not at all confident', score: 1 },
+    ],
+  },
+  {
+    id: 15,
+    dimension: 'D4',
+    type: 'single_select',
+    question: 'Which AI application would most transform your L&D practice?',
+    options: [
+      { text: 'AI that generates complete course content from a learning brief', score: 4 },
+      { text: 'AI that personalises learning paths for each learner automatically', score: 4 },
+      { text: 'AI that analyses learner performance and recommends interventions', score: 3 },
+      { text: 'I am not sure yet', score: 2 },
+    ],
+  },
+]
+
 // ─── Exports ──────────────────────────────────────────────────────────────────
 
 export const CLUSTER_QUESTIONS = {
@@ -847,6 +1037,7 @@ export const CLUSTER_QUESTIONS = {
   B: CLUSTER_B,
   C: CLUSTER_C,
   D: CLUSTER_D,
+  E: CLUSTER_E,
 }
 
 // ─── Scoring ──────────────────────────────────────────────────────────────────
