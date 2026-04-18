@@ -648,12 +648,205 @@ const CLUSTER_C = [
   },
 ]
 
+// ─── CLUSTER D ────────────────────────────────────────────────────────────────
+
+const CLUSTER_D = [
+  {
+    id: 1,
+    dimension: 'D2',
+    type: 'multi_select',
+    question: 'Which AI-assisted tools have you used in the past month?',
+    options: [
+      { text: 'Claude' },
+      { text: 'GitHub Copilot' },
+      { text: 'ChatGPT' },
+      { text: 'Cursor' },
+      { text: 'Notion AI' },
+      { text: 'n8n or Make' },
+      { text: 'None' },
+      { text: 'Other' },
+    ],
+    scoreLogic: (selectedTexts) => {
+      if (selectedTexts.includes('None') && selectedTexts.length === 1) return 1
+      const validCount = selectedTexts.filter(t => t !== 'None').length
+      if (validCount >= 3) return 4
+      if (validCount === 2) return 3
+      if (validCount === 1) return 2
+      return 1
+    },
+  },
+  {
+    id: 2,
+    dimension: 'D5',
+    type: 'single_select',
+    question: 'Have you built, automated or improved any workflow using AI in the last 3 months?',
+    options: [
+      { text: 'Yes, multiple workflows', score: 4 },
+      { text: 'Yes, one workflow', score: 3 },
+      { text: 'In progress', score: 2 },
+      { text: 'Not yet', score: 1 },
+    ],
+  },
+  {
+    id: 3,
+    dimension: 'D3',
+    type: 'single_select',
+    question: 'When using AI for technical tasks, how do you structure your prompt?',
+    options: [
+      { text: 'I include role, context, constraints and output format', score: 4 },
+      { text: 'I describe what I want in plain language', score: 2 },
+      { text: 'I paste code and ask it to fix without context', score: 1 },
+      { text: 'I do not use AI for technical work', score: 1 },
+    ],
+  },
+  {
+    id: 4,
+    dimension: 'D4',
+    type: 'open_text',
+    question: 'Which engineering or product task in your role is most repetitive and could be automated with AI?',
+    placeholder: 'Describe the task...',
+  },
+  {
+    id: 5,
+    dimension: 'D1',
+    type: 'single_select',
+    question: 'A stakeholder asks you to add AI to an existing product feature. What is your first question?',
+    options: [
+      { text: 'What specific problem are we solving with AI?', score: 4 },
+      { text: 'What is the budget?', score: 2 },
+      { text: 'Which AI tool should we use?', score: 2 },
+      { text: 'I would start building a prototype immediately', score: 3 },
+    ],
+  },
+  {
+    id: 6,
+    dimension: 'D5',
+    type: 'single_select',
+    question: 'How comfortable are you integrating an AI API into a product or internal tool?',
+    options: [
+      { text: 'Very comfortable, I have done it before', score: 4 },
+      { text: 'Some experience, could do it with reference', score: 3 },
+      { text: 'I would need significant guidance', score: 2 },
+      { text: 'No experience at all', score: 1 },
+    ],
+  },
+  {
+    id: 7,
+    dimension: 'D3',
+    type: 'single_select',
+    question: 'You need AI to produce structured JSON from unstructured text. Can you write a prompt that reliably does this?',
+    options: [
+      { text: 'Yes, confidently', score: 4 },
+      { text: 'I would attempt it with trial and error', score: 3 },
+      { text: 'I am not sure how to approach this', score: 2 },
+      { text: 'No', score: 1 },
+    ],
+  },
+  {
+    id: 8,
+    dimension: 'D2',
+    type: 'single_select',
+    question: 'How often do you use AI to assist with documentation, specs or technical writing?',
+    options: [
+      { text: 'Daily', score: 4 },
+      { text: 'Weekly', score: 3 },
+      { text: 'Occasionally', score: 2 },
+      { text: 'Never', score: 1 },
+    ],
+  },
+  {
+    id: 9,
+    dimension: 'D4',
+    type: 'single_select',
+    question: 'You are scoping a new internal tool. At what stage do you consider AI capabilities?',
+    options: [
+      { text: 'From the very start, it is a default consideration', score: 4 },
+      { text: 'During design phase if it seems to fit', score: 3 },
+      { text: 'Only if a stakeholder requests it', score: 2 },
+      { text: 'I have not built with AI yet', score: 1 },
+    ],
+  },
+  {
+    id: 10,
+    dimension: 'D1',
+    type: 'single_select',
+    question: 'A junior team member asks if they can use ChatGPT to write production code. What is your response?',
+    options: [
+      { text: 'Yes, with mandatory code review', score: 4 },
+      { text: 'Yes, without restriction', score: 1 },
+      { text: 'No, it is a security risk', score: 2 },
+      { text: 'It depends on the data classification of the codebase', score: 4 },
+    ],
+  },
+  {
+    id: 11,
+    dimension: 'D3',
+    type: 'single_select',
+    question: 'How do you use AI to speed up code review or debugging?',
+    options: [
+      { text: 'I paste the code with full context and ask AI to identify issues and suggest fixes', score: 4 },
+      { text: 'I ask AI to explain what the code does', score: 3 },
+      { text: 'I only use AI for writing new code, not reviewing', score: 2 },
+      { text: 'I do not use AI for code review', score: 1 },
+    ],
+  },
+  {
+    id: 12,
+    dimension: 'D5',
+    type: 'single_select',
+    question: 'Have you used AI to generate or improve technical documentation or API specs?',
+    options: [
+      { text: 'Yes, regularly', score: 4 },
+      { text: 'Yes, occasionally', score: 3 },
+      { text: 'Not yet, but planning to', score: 2 },
+      { text: 'No', score: 1 },
+    ],
+  },
+  {
+    id: 13,
+    dimension: 'D2',
+    type: 'single_select',
+    question: 'How proficient are you with prompt engineering for technical outputs?',
+    options: [
+      { text: 'Very proficient, I write structured multi-step prompts', score: 4 },
+      { text: 'Intermediate, good results with iteration', score: 3 },
+      { text: 'Basic, simple prompts with mixed results', score: 2 },
+      { text: 'Beginner', score: 1 },
+    ],
+  },
+  {
+    id: 14,
+    dimension: 'D4',
+    type: 'single_select',
+    question: 'Which AI capability would add most value to your technical role?',
+    options: [
+      { text: 'AI-assisted code generation and review', score: 4 },
+      { text: 'Automated testing and QA', score: 4 },
+      { text: 'AI for system architecture design', score: 3 },
+      { text: 'I am not sure yet', score: 2 },
+    ],
+  },
+  {
+    id: 15,
+    dimension: 'D1',
+    type: 'single_select',
+    question: 'How do you stay updated on new AI tools and capabilities?',
+    options: [
+      { text: 'I actively experiment with new tools and follow AI research', score: 4 },
+      { text: 'I read articles and follow industry news', score: 3 },
+      { text: 'I learn when my team shares something', score: 2 },
+      { text: 'I do not actively follow AI developments', score: 1 },
+    ],
+  },
+]
+
 // ─── Exports ──────────────────────────────────────────────────────────────────
 
 export const CLUSTER_QUESTIONS = {
   A: CLUSTER_A,
   B: CLUSTER_B,
   C: CLUSTER_C,
+  D: CLUSTER_D,
 }
 
 // ─── Scoring ──────────────────────────────────────────────────────────────────
