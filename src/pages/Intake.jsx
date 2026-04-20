@@ -134,7 +134,7 @@ export default function Intake() {
 
       {/* Navbar */}
       <nav className="flex items-center justify-between px-6 py-5 max-w-2xl mx-auto">
-        <Logo />
+        <Logo height={36} />
         <span className="bg-[#00ADA9]/20 border border-[#00ADA9]/40 text-[#00ADA9] text-xs font-bold px-3 py-1.5 rounded-full">
           {PATH_BADGE[path]}
         </span>

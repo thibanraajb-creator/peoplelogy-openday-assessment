@@ -1,8 +1,11 @@
-export default function Logo() {
+export default function Logo({ height = 40 }) {
   return (
-    <span className="font-black text-xl tracking-tight">
-      <span className="text-white">PEOPLE</span>
-      <span style={{ color: '#00ADA9' }}>logy</span>
-    </span>
+    <a href="/" style={{ display: 'inline-block', cursor: 'pointer' }}>
+      <img
+        src="/peoplelogy-logo.png"
+        alt="PEOPLElogy"
+        style={{ height: height + 'px', width: 'auto', filter: 'brightness(0) invert(1)' }}
+      />
+    </a>
   )
 }

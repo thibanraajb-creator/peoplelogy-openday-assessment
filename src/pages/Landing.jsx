@@ -262,7 +262,7 @@ export default function Landing() {
           borderBottom: '1px solid rgba(255,255,255,0.05)',
         }}
       >
-        <Logo />
+        <Logo height={36} />
         <span
           className="text-xs font-semibold px-4 py-1.5 rounded-full"
           style={{
