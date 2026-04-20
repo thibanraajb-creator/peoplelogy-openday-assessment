@@ -2,12 +2,11 @@ export default function Logo({ height = 36 }) {
   return (
     <a href="/" style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', textDecoration: 'none' }}>
       <img
-        src="/peoplelogy-logo.png"
+        src="/peoplelogy-logo-transparent.png"
         alt="PEOPLElogy"
         style={{
           height: height + 'px',
           width: 'auto',
-          filter: 'brightness(0) invert(1)',
           display: 'block'
         }}
         onError={(e) => {
