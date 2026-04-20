@@ -47,8 +47,37 @@ function LocationIcon() {
 
 // ── Path card ────────────────────────────────────────────────────────────────
 
-function PathCard({ icon, title, description, time, buttonText, badge, glow, buttonStyle, buttonHoverClass, onClick }) {
+function PathCard({ icon, title, description, time, buttonText, badge, glow, onClick }) {
   const [hovered, setHovered] = useState(false)
+  const [btnHovered, setBtnHovered] = useState(false)
+
+  const buttonStyle = glow
+    ? {
+        background: btnHovered ? '#00c4c0' : '#00ADA9',
+        border: '1px solid transparent',
+        color: 'white',
+        width: '100%',
+        fontWeight: 'bold',
+        paddingTop: '14px',
+        paddingBottom: '14px',
+        borderRadius: '12px',
+        transition: 'all 0.2s',
+        fontSize: '14px',
+        cursor: 'pointer',
+      }
+    : {
+        background: btnHovered ? '#00ADA9' : 'transparent',
+        border: btnHovered ? '1px solid #00ADA9' : '1px solid rgba(255,255,255,0.3)',
+        color: 'white',
+        width: '100%',
+        fontWeight: 'bold',
+        paddingTop: '14px',
+        paddingBottom: '14px',
+        borderRadius: '12px',
+        transition: 'all 0.2s',
+        fontSize: '14px',
+        cursor: 'pointer',
+      }
 
   return (
     <div
@@ -70,6 +99,7 @@ function PathCard({ icon, title, description, time, buttonText, badge, glow, but
         animation: glow ? 'glowBorder 3s ease-in-out infinite' : undefined,
         minHeight: '360px',
         padding: '32px',
+        paddingBottom: '32px',
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -124,8 +154,9 @@ function PathCard({ icon, title, description, time, buttonText, badge, glow, but
 
       <button
         onClick={onClick}
-        className={`w-full font-bold py-3.5 rounded-xl transition-all duration-200 text-white text-sm tracking-wide ${buttonHoverClass}`}
         style={buttonStyle}
+        onMouseEnter={() => setBtnHovered(true)}
+        onMouseLeave={() => setBtnHovered(false)}
       >
         {buttonText}
       </button>
@@ -336,9 +367,9 @@ export default function Landing() {
               {hasActivity ? (
                 <div className="flex items-center gap-0">
                   {[
-                    { value: totalShown, label: 'Assessments Completed' },
-                    { value: orgCount,   label: 'Organisations Assessed' },
-                    { value: championCount, label: 'AI Champions Found' },
+                    { value: totalShown,    label: 'assessments completed' },
+                    { value: orgCount,      label: 'organisations assessed' },
+                    { value: championCount, label: 'AI Champions identified' },
                   ].map((stat, i) => (
                     <div key={i} className="flex items-center flex-1">
                       <div className="flex-1 text-center">
@@ -381,7 +412,7 @@ export default function Landing() {
       </div>
 
       {/* Path cards */}
-      <section className="max-w-7xl mx-auto px-8 pb-20">
+      <section className="max-w-7xl mx-auto px-8 pb-20" style={{ marginTop: '48px' }}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           <PathCard
             icon={<BuildingIcon />}
@@ -389,11 +420,6 @@ export default function Landing() {
             description="Evaluate how ready your organisation is to adopt and scale AI across strategy, data, people, processes and governance."
             time="~10 minutes · 25 questions"
             buttonText="Start Org Assessment →"
-            buttonStyle={{
-              background: 'rgba(255,255,255,0.08)',
-              border: '1px solid rgba(255,255,255,0.12)',
-            }}
-            buttonHoverClass="hover:bg-[#00ADA9] hover:border-transparent"
             onClick={() => handleStart('org')}
           />
           <PathCard
@@ -404,8 +430,6 @@ export default function Landing() {
             buttonText="Start Personal Assessment →"
             badge="MOST POPULAR"
             glow
-            buttonStyle={{ background: '#00ADA9' }}
-            buttonHoverClass="hover:bg-[#00c4c0]"
             onClick={() => handleStart('individual')}
           />
           <PathCard
@@ -414,11 +438,6 @@ export default function Landing() {
             description="The complete picture. Assess both your organisation's readiness and your personal AI capability. Get a comprehensive gap analysis."
             time="~18 minutes · 40 questions"
             buttonText="Start Full Assessment →"
-            buttonStyle={{
-              background: 'rgba(255,255,255,0.08)',
-              border: '1px solid rgba(255,255,255,0.12)',
-            }}
-            buttonHoverClass="hover:bg-[#00ADA9] hover:border-transparent"
             onClick={() => handleStart('full')}
           />
         </div>
