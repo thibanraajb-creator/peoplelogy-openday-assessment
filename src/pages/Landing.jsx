@@ -4,7 +4,7 @@ import Logo from '../components/Logo'
 import NeuralNetwork from '../components/NeuralNetwork'
 import { supabase, SESSION_CODE } from '../lib/supabase'
 
-const FULL_TEXT = 'AI Readiness\nOpen Day · Johor Bahru'
+const FULL_TEXT = 'AI Readiness'
 
 // ── Icons ────────────────────────────────────────────────────────────────────
 
@@ -221,11 +221,7 @@ export default function Landing() {
 
   const handleStart = (path) => navigate('/intake', { state: { path } })
 
-  // Render typed text: split at newline
   const sliced = FULL_TEXT.slice(0, typed)
-  const newlinePos = FULL_TEXT.indexOf('\n')
-  const line1Raw = sliced.slice(0, newlinePos)
-  const line2Raw = typed > newlinePos ? sliced.slice(newlinePos + 1) : ''
   const totalShown = orgCount + indCount
   const hasActivity = totalShown > 0 || championCount > 0
 
@@ -321,12 +317,8 @@ export default function Landing() {
             </div>
 
             {/* Typing title */}
-            <h1 className="font-black text-white leading-tight mb-6" style={{ fontSize: '3.75rem', minHeight: '9rem' }}>
-              {line1Raw}
-              {typed > newlinePos && <br />}
-              <span style={{ color: '#00ADA9', textShadow: '0 0 40px rgba(0,173,169,0.4)' }}>
-                {line2Raw}
-              </span>
+            <h1 className="font-black text-white leading-tight mb-6" style={{ fontSize: '3.75rem', minHeight: '5rem' }}>
+              {sliced}
               <span
                 className="inline-block w-[3px] bg-white ml-1 align-middle"
                 style={{
