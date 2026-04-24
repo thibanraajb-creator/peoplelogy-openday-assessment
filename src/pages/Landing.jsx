@@ -4,7 +4,7 @@ import Logo from '../components/Logo'
 import NeuralNetwork from '../components/NeuralNetwork'
 import { supabase, SESSION_CODE } from '../lib/supabase'
 
-const FULL_TEXT = 'AI Readiness\nAssessment'
+const FULL_TEXT = 'AI Readiness\nOpen Day · Johor Bahru'
 
 // ── Icons ────────────────────────────────────────────────────────────────────
 
@@ -434,7 +434,7 @@ export default function Landing() {
           />
           <PathCard
             icon={<ChartIcon />}
-            title="Full AI Readiness Assessment"
+            title="Full AI Readiness"
             description="The complete picture. Assess both your organisation's readiness and your personal AI capability. Get a comprehensive gap analysis."
             time="~18 minutes · 40 questions"
             buttonText="Start Full Assessment →"
