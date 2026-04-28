@@ -40,6 +40,9 @@ const initialState = {
   individualResponseId: null,
   orgScores: null,
   individualScores: null,
+  qualitativeResponses: { q1: null, q2: null, q3: null, q4: null, q5: null, q6: null, q7: null, q8: null },
+  qualitativeScores: null,
+  qualitativeResponseId: null,
 }
 
 export function AssessmentProvider({ children }) {
@@ -91,6 +94,21 @@ export function AssessmentProvider({ children }) {
     setAssessmentData(prev => ({ ...prev, individualResponseId: id }))
   }, [])
 
+  const updateQualitativeResponse = useCallback((key, value) => {
+    setAssessmentData(prev => ({
+      ...prev,
+      qualitativeResponses: { ...prev.qualitativeResponses, [key]: value },
+    }))
+  }, [])
+
+  const setQualitativeScores = useCallback((scores) => {
+    setAssessmentData(prev => ({ ...prev, qualitativeScores: scores }))
+  }, [])
+
+  const setQualitativeResponseId = useCallback((id) => {
+    setAssessmentData(prev => ({ ...prev, qualitativeResponseId: id }))
+  }, [])
+
   const resetAssessment = useCallback(() => {
     setAssessmentData(initialState)
   }, [])
@@ -106,6 +124,9 @@ export function AssessmentProvider({ children }) {
       setIndividualScores,
       setOrgResponseId,
       setIndividualResponseId,
+      updateQualitativeResponse,
+      setQualitativeScores,
+      setQualitativeResponseId,
       resetAssessment,
     }}>
       {children}
