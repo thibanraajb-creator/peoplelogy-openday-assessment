@@ -111,7 +111,10 @@ export default function SurveyQualitative() {
 
     setSaving(false)
 
-    if (assessmentData.path === 'full') {
+    const path = assessmentData.path
+    if (path === 'individual') {
+      navigate('/survey/individual')
+    } else if (path === 'full') {
       navigate('/transition')
     } else {
       navigate('/results')

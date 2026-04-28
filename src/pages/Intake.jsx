@@ -125,7 +125,7 @@ export default function Intake() {
     setPath(path)
     updateIntake(form)   // cluster auto-assigned inside context
 
-    if (path === 'individual') navigate('/survey/individual')
+    if (path === 'individual') navigate('/survey/qualitative')
     else navigate('/survey/org')
   }
 

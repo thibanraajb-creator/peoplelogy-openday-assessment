@@ -8,6 +8,7 @@ import Transition from './pages/Transition'
 import Results from './pages/Results'
 import Dashboard from './pages/Dashboard'
 import Facilitator from './pages/Facilitator'
+import SurveyQualitative from './pages/SurveyQualitative'
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
           <Route path="/intake" element={<Intake />} />
           <Route path="/survey/org" element={<SurveyOrg />} />
           <Route path="/survey/individual" element={<SurveyIndividual />} />
+          <Route path="/survey/qualitative" element={<SurveyQualitative />} />
           <Route path="/transition" element={<Transition />} />
           <Route path="/results" element={<Results />} />
           <Route path="/dashboard" element={<Dashboard />} />

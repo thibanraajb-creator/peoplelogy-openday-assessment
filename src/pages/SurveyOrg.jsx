@@ -131,12 +131,8 @@ export default function SurveyOrg() {
 
     setSaving(false)
 
-    if (path === 'org') {
-      navigate('/results')
-    } else {
-      setOrgResponseId(data.id)
-      navigate('/transition')
-    }
+    setOrgResponseId(data.id)
+    navigate('/survey/qualitative')
   }
 
   return (
