@@ -70,11 +70,7 @@ export default function SurveyQualitative() {
     setSaving(true)
     setSaveError(null)
 
-    const orgPct = assessmentData.orgScores?.overallPercentage ?? 50
-    const capPct = assessmentData.individualScores
-      ? Math.round(assessmentData.individualScores.overallAverage * 25)
-      : 50
-    const scores = computeQualitativeScores(localResponses, orgPct, capPct)
+    const scores = computeQualitativeScores(localResponses)
     setQualitativeScores(scores)
 
     const payload = {
