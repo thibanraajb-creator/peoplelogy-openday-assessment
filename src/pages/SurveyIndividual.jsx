@@ -87,7 +87,7 @@ function OpenText({ value, onChange, placeholder }) {
 
 export default function SurveyIndividual() {
   const navigate = useNavigate()
-  const { assessmentData, setIndividualScores, setIndividualResponseId } = useAssessment()
+  const { assessmentData, setIndividualScores } = useAssessment()
 
   const cluster   = assessmentData.intake.cluster || 'A'
   const questions = CLUSTER_QUESTIONS[cluster] || CLUSTER_QUESTIONS.A
@@ -192,31 +192,15 @@ export default function SurveyIndividual() {
     console.log('[DEBUG] scores:', JSON.stringify(scores))
     console.log('[DEBUG] intake:', JSON.stringify(assessmentData.intake))
 
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('openday_individual_capability')
-      .insert(payload)
-      .select('id')
-      .single()
-
-    console.log('[SurveyIndividual] Result:', data, error)
+      .insert([payload])
 
     if (error) {
-      console.error('[SurveyIndividual] FULL ERROR:', JSON.stringify({
-        message: error.message,
-        code: error.code,
-        details: error.details,
-        hint: error.hint,
-        status: error.status
-      }))
-      alert('Error: ' + error.message + ' | Code: ' + error.code + ' | Details: ' + error.details + ' | Hint: ' + error.hint)
-      setSaveError('Save error: ' + error.message + ' | Code: ' + error.code)
+      setSaveError('Save error: ' + error.message)
       setSaving(false)
       navigate('/results')
       return
-    }
-
-    if (data?.id) {
-      setIndividualResponseId(data.id)
     }
 
     setSaving(false)

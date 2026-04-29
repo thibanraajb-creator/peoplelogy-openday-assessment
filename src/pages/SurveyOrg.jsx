@@ -26,7 +26,7 @@ const LIKERT = [
 
 export default function SurveyOrg() {
   const navigate = useNavigate()
-  const { assessmentData, setOrgScores, setOrgResponseId } = useAssessment()
+  const { assessmentData, setOrgScores } = useAssessment()
   const { path, intake } = assessmentData
 
   // Local answers: one array per pillar, sized to actual question count
@@ -94,7 +94,7 @@ export default function SurveyOrg() {
     const scores = computeOrgScores(responsesObj)
     setOrgScores(scores)
 
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('openday_responses')
       .insert([{
         first_name:     intake.firstName,
@@ -118,10 +118,6 @@ export default function SurveyOrg() {
         p4_q1: orgResponses[15], p4_q2: orgResponses[16], p4_q3: orgResponses[17], p4_q4: orgResponses[18], p4_q5: orgResponses[19],
         p5_q1: orgResponses[20], p5_q2: orgResponses[21], p5_q3: orgResponses[22], p5_q4: orgResponses[23], p5_q5: orgResponses[24],
       }])
-      .select('id')
-      .single()
-
-    console.log('[SurveyOrg] Insert result:', data, error)
 
     if (error) {
       setSaveError('Save error: ' + error.message)
@@ -130,8 +126,6 @@ export default function SurveyOrg() {
     }
 
     setSaving(false)
-
-    setOrgResponseId(data.id)
     navigate('/survey/qualitative')
   }
 

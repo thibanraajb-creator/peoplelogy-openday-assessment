@@ -7,7 +7,7 @@ import Logo from '../components/Logo'
 
 export default function SurveyQualitative() {
   const navigate = useNavigate()
-  const { assessmentData, setQualitativeScores, setQualitativeResponseId } = useAssessment()
+  const { assessmentData, setQualitativeScores } = useAssessment()
 
   const [currentQ,     setCurrentQ]     = useState(0)
   const [saving,       setSaving]       = useState(false)
@@ -93,19 +93,13 @@ export default function SurveyQualitative() {
       archetype:                   scores.archetype,
     }
 
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('openday_qualitative')
       .insert([payload])
-      .select('id')
-      .single()
 
-    console.log('[SurveyQualitative] Result:', data, error)
     if (error) {
-      console.error('[SurveyQualitative] Error:', error.message)
       setSaveError('Save error: ' + error.message)
     }
-
-    if (data?.id) setQualitativeResponseId(data.id)
 
     setSaving(false)
 
