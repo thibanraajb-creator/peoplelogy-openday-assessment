@@ -1,10 +1,11 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAssessment } from '../context/AssessmentContext'
 import { RadarChart, PolarGrid, PolarAngleAxis, Radar, ResponsiveContainer, Tooltip } from 'recharts'
 import Confetti from '../components/Confetti'
 import Logo from '../components/Logo'
 import { ARCHETYPES, PRIORITIES } from '../data/archetypes'
+import { TRACKS, ARCHETYPE_TRACKS } from '../data/tracks'
 import { assignArchetype } from '../data/qualitativeQuestions'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
@@ -36,6 +37,8 @@ export default function Results() {
   const archetype     = qualitativeScores ? assignArchetype(orgPct, capPct) : null
   const archetypeData = archetype ? ARCHETYPES[archetype] : null
   const priorities    = archetype ? PRIORITIES[archetype] : null
+  const [expandedTrack, setExpandedTrack] = useState(null)
+  const trackRecommendation = archetype ? ARCHETYPE_TRACKS[archetype] : null
 
   // Org-derived
   const pillarPcts   = orgScores ? orgScores.pillarScores.map(p => p.percentage) : []
@@ -283,6 +286,37 @@ export default function Results() {
               </div>
             )}
 
+            {(() => {
+              const heatmapDimensions = [
+                { name: 'AI Awareness',        pct: Math.round(individualScores.dimensionAverages.D1 * 25), desc: 'Understanding of AI concepts, tools and responsible use' },
+                { name: 'Tool Proficiency',    pct: Math.round(individualScores.dimensionAverages.D2 * 25), desc: 'Daily usage of AI tools in your role' },
+                { name: 'Prompt Ability',      pct: Math.round(individualScores.dimensionAverages.D3 * 25), desc: 'Quality and effectiveness of AI prompting' },
+                { name: 'Opportunity Spotting',pct: Math.round(individualScores.dimensionAverages.D4 * 25), desc: 'Identifying AI opportunities in your work' },
+                { name: 'Workflow Integration',pct: Math.round(individualScores.dimensionAverages.D5 * 25), desc: 'Embedding AI into daily work routines' },
+              ]
+              const barColor   = pct => pct >= 75 ? '#22C55E' : pct >= 50 ? '#F97316' : '#EF4444'
+              const scoreColor = pct => pct >= 75 ? 'text-[#22C55E]' : pct >= 50 ? 'text-[#F97316]' : 'text-[#EF4444]'
+              return (
+                <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm mb-4">
+                  <p className="text-[#00ADA9] text-xs font-bold uppercase tracking-widest mb-4">SKILLS HEATMAP</p>
+                  {heatmapDimensions.map(d => (
+                    <div key={d.name} className="flex items-center gap-3 mb-3">
+                      <span className="w-36 text-sm font-semibold text-[#1B3A5C] flex-shrink-0">{d.name}</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                        <div className="h-4 rounded-full" style={{ width: `${d.pct}%`, backgroundColor: barColor(d.pct) }} />
+                      </div>
+                      <span className={`w-10 text-right text-sm font-bold ${scoreColor(d.pct)}`}>{d.pct}%</span>
+                    </div>
+                  ))}
+                  <div className="flex gap-3 mt-2">
+                    <span className="bg-[#22C55E]/15 text-[#22C55E] text-xs px-3 py-1 rounded-full">≥75% Strong</span>
+                    <span className="bg-[#F97316]/15 text-[#F97316] text-xs px-3 py-1 rounded-full">50–74% Developing</span>
+                    <span className="bg-[#EF4444]/15 text-[#EF4444] text-xs px-3 py-1 rounded-full">&lt;50% Needs Focus</span>
+                  </div>
+                </div>
+              )
+            })()}
+
             {path === 'individual' && (
               <div className="bg-[#e8edf3] border border-[#1B3A5C] rounded-2xl p-5">
                 <p className="text-[#1B3A5C] font-bold text-base mb-1">See how your organisation compares?</p>
@@ -305,7 +339,7 @@ export default function Results() {
           const absGap = Math.abs(gap)
           return (
             <div>
-              <p className="text-[#00ADA9] text-xs font-bold uppercase tracking-widest mb-3">GAP ANALYSIS</p>
+              <p className="text-[#00ADA9] text-xs font-bold uppercase tracking-widest mb-3">GAP &amp; OPPORTUNITY MAP</p>
               <div className="bg-white rounded-2xl p-6 border border-gray-100">
                 <div className="flex items-center justify-between gap-4 mb-6">
                   <div className="text-center flex-1">
@@ -349,7 +383,7 @@ export default function Results() {
         {/* BLOCK 7 — WHAT NEEDS TO HAPPEN */}
         <div>
           <p className="text-[#00ADA9] text-xs font-bold uppercase tracking-widest mb-3">
-            WHAT NEEDS TO HAPPEN
+            WHAT YOU SHOULD DO FIRST
           </p>
           <div className="space-y-3">
             {(priorities || [
