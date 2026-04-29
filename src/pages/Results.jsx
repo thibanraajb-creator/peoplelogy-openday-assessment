@@ -5,6 +5,7 @@ import { RadarChart, PolarGrid, PolarAngleAxis, Radar, ResponsiveContainer, Tool
 import Confetti from '../components/Confetti'
 import Logo from '../components/Logo'
 import { ARCHETYPES, PRIORITIES } from '../data/archetypes'
+import { assignArchetype } from '../data/qualitativeQuestions'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 
@@ -29,19 +30,22 @@ export default function Results() {
     return null
   }
 
-  const archetype     = qualitativeScores?.archetype || null
+  const orgPct       = orgScores ? orgScores.overallPercentage : 50
+  const capPct       = individualScores ? Math.round(individualScores.overallAverage * 25) : 50
+
+  const archetype     = qualitativeScores ? assignArchetype(orgPct, capPct) : null
   const archetypeData = archetype ? ARCHETYPES[archetype] : null
   const priorities    = archetype ? PRIORITIES[archetype] : null
 
   // Org-derived
   const pillarPcts   = orgScores ? orgScores.pillarScores.map(p => p.percentage) : []
-  const orgPct       = orgScores?.overallPercentage ?? 0
   const minPct       = pillarPcts.length ? Math.min(...pillarPcts) : null
   const maxPct       = pillarPcts.length ? Math.max(...pillarPcts) : null
+  const allEqual     = minPct !== null && minPct === maxPct
   const radarData    = PILLAR_NAMES.map((name, i) => ({ name, score: pillarPcts[i] ?? 0 }))
 
-  // Individual-derived
-  const indPct = individualScores ? Math.round(individualScores.overallAverage * 25) : 0
+  // Individual-derived (capPct doubles as indPct for display)
+  const indPct = capPct
 
   const handleDownloadPDF = async () => {
     const el = reportRef.current
@@ -182,8 +186,8 @@ export default function Results() {
             <div className="grid grid-cols-5 gap-3 mb-4">
               {PILLAR_NAMES.map((name, i) => {
                 const pct         = pillarPcts[i] ?? 0
-                const isWeakest   = pct === minPct
-                const isStrongest = pct === maxPct && pct !== minPct
+                const isWeakest   = !allEqual && pct === minPct
+                const isStrongest = !allEqual && pct === maxPct
                 return (
                   <div
                     key={i}

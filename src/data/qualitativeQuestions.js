@@ -36,6 +36,7 @@ export const QUALITATIVE_QUESTIONS = [
       { text: 'Leadership does not treat it as a priority',                  opScore: 1 },
       { text: 'We do not know where to start',                               opScore: 1 },
       { text: 'We are waiting for someone else to figure it out first',      opScore: 0 },
+      { text: 'There are no significant barriers — we are moving well with AI', opScore: 4 },
     ],
   },
   {
@@ -99,31 +100,32 @@ export const QUALITATIVE_QUESTIONS = [
 ]
 
 // Index positions for q3 options
-const Q3_WAITING_IDX   = 5   // "We are waiting for someone else..."
-const Q3_SKILL_DATA    = [1, 2]  // skills, data
-const Q3_STRATEGY_LEAD = [0, 3, 4]  // strategy, leadership, don't know where to start
+const Q3_WAITING_IDX    = 5   // "We are waiting for someone else..."
+const Q3_NO_BARRIER_IDX = 6   // "There are no significant barriers..."
+const Q3_SKILL_DATA     = [1, 2]  // skills, data
 
 function scoreQ3(selected) {
   if (!Array.isArray(selected) || selected.length === 0) return 1
+  if (selected.includes(Q3_NO_BARRIER_IDX)) return 4
   if (selected.includes(Q3_WAITING_IDX)) return 1
   const allSkillOrData = selected.every(i => Q3_SKILL_DATA.includes(i))
   if (allSkillOrData) return 4
   return 2
 }
 
-function assignArchetype(orgPct, capPct) {
-  if (orgPct < 40 && capPct < 60)                              return 'The Sleeping Organisation'
-  if (orgPct < 40 && capPct >= 60)                             return 'The Frustrated Innovator'
-  if (orgPct >= 40 && orgPct < 65 && capPct < 60)             return 'The Hollow Strategy'
-  if (orgPct >= 40 && orgPct < 65 && capPct >= 60 && capPct < 75) return 'The Cautious Mover'
+export function assignArchetype(orgPct, capPct) {
+  if (orgPct < 40 && capPct < 55)                              return 'The Sleeping Organisation'
+  if (orgPct < 40 && capPct >= 55)                             return 'The Frustrated Innovator'
+  if (orgPct >= 40 && orgPct < 65 && capPct < 55)             return 'The Hollow Strategy'
+  if (orgPct >= 40 && orgPct < 65 && capPct >= 55 && capPct < 75) return 'The Cautious Mover'
   if (orgPct >= 40 && orgPct < 65 && capPct >= 75)            return 'The Untapped Asset'
-  if (orgPct >= 65 && capPct < 60)                            return 'The Broken Pipeline'
-  if (orgPct >= 65 && capPct >= 60 && capPct < 80)            return 'The Scaling Organisation'
-  if (orgPct >= 65 && capPct >= 80)                           return 'The AI-Ready Organisation'
+  if (orgPct >= 65 && capPct < 55)                            return 'The Broken Pipeline'
+  if (orgPct >= 65 && capPct >= 55 && capPct < 75)            return 'The Scaling Organisation'
+  if (orgPct >= 65 && capPct >= 75)                           return 'The AI-Ready Organisation'
   return 'The Cautious Mover'
 }
 
-export function computeQualitativeScores(responses, orgOverallPercentage, individualOverallAverage) {
+export function computeQualitativeScores(responses, orgPct = 50, capPct = 50) {
   const q1 = QUALITATIVE_QUESTIONS[0].options[responses.q1]?.opScore ?? 1
   const q2 = QUALITATIVE_QUESTIONS[1].options[responses.q2]?.opScore ?? 1
   const q3 = scoreQ3(responses.q3)
@@ -136,10 +138,6 @@ export function computeQualitativeScores(responses, orgOverallPercentage, indivi
   const q7 = QUALITATIVE_QUESTIONS[6].options[responses.q7]?.lcScore ?? 1
 
   const leadershipScore = Math.round(((q5 + q6 + q7) / 12) * 100)
-
-  // capPct: individual overall average is 1-4 scale, convert to 0-100
-  const capPct = Math.round((individualOverallAverage ?? 1) * 25)
-  const orgPct = orgOverallPercentage ?? 0
 
   const archetype = assignArchetype(orgPct, capPct)
 
