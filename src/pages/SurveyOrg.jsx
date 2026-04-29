@@ -94,7 +94,7 @@ export default function SurveyOrg() {
     const scores = computeOrgScores(responsesObj)
     setOrgScores(scores)
 
-    const { error } = await supabase
+    const { error: orgError } = await supabase
       .from('openday_responses')
       .insert([{
         first_name:     intake.firstName,
@@ -119,8 +119,9 @@ export default function SurveyOrg() {
         p5_q1: orgResponses[20], p5_q2: orgResponses[21], p5_q3: orgResponses[22], p5_q4: orgResponses[23], p5_q5: orgResponses[24],
       }])
 
-    if (error) {
-      setSaveError('Save error: ' + error.message)
+    console.log('[SurveyOrg] Insert error:', orgError)
+    if (orgError) {
+      setSaveError('Save error: ' + orgError.message)
       setSaving(false)
       return
     }

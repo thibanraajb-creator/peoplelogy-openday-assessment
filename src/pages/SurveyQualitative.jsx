@@ -93,12 +93,13 @@ export default function SurveyQualitative() {
       archetype:                   scores.archetype,
     }
 
-    const { error } = await supabase
+    const { error: qualError } = await supabase
       .from('openday_qualitative')
       .insert([payload])
 
-    if (error) {
-      setSaveError('Save error: ' + error.message)
+    console.log('[SurveyQualitative] Insert error:', qualError)
+    if (qualError) {
+      setSaveError('Save error: ' + qualError.message)
     }
 
     setSaving(false)

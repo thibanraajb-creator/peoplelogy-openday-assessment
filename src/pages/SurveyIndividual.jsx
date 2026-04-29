@@ -192,14 +192,14 @@ export default function SurveyIndividual() {
     console.log('[DEBUG] scores:', JSON.stringify(scores))
     console.log('[DEBUG] intake:', JSON.stringify(assessmentData.intake))
 
-    const { error } = await supabase
+    const { error: indError } = await supabase
       .from('openday_individual_capability')
       .insert([payload])
 
-    if (error) {
-      setSaveError('Save error: ' + error.message)
+    console.log('[SurveyIndividual] Insert error:', indError)
+    if (indError) {
+      setSaveError('Save error: ' + indError.message)
       setSaving(false)
-      navigate('/results')
       return
     }
 
