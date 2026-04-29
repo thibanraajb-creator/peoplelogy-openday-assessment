@@ -125,7 +125,7 @@ export function assignArchetype(orgPct, capPct) {
   return 'The Cautious Mover'
 }
 
-export function computeQualitativeScores(responses, orgPct = 50, capPct = 50) {
+export function computeQualitativeScores(responses, orgPct = 50, capPct = 62) {
   const q1 = QUALITATIVE_QUESTIONS[0].options[responses.q1]?.opScore ?? 1
   const q2 = QUALITATIVE_QUESTIONS[1].options[responses.q2]?.opScore ?? 1
   const q3 = scoreQ3(responses.q3)

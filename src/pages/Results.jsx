@@ -31,7 +31,7 @@ export default function Results() {
   }
 
   const orgPct       = orgScores ? orgScores.overallPercentage : 50
-  const capPct       = individualScores ? Math.round(individualScores.overallAverage * 25) : 50
+  const capPct       = individualScores ? Math.round(individualScores.overallAverage * 25) : 62
 
   const archetype     = qualitativeScores ? assignArchetype(orgPct, capPct) : null
   console.log('[Results] orgPct:', orgPct, 'capPct:', capPct, 'archetype:', archetype)
