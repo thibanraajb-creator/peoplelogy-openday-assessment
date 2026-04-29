@@ -34,12 +34,6 @@ export default function Results() {
   const capPct       = individualScores ? Math.round(individualScores.overallAverage * 25) : 62
 
   const archetype     = qualitativeScores ? assignArchetype(orgPct, capPct) : null
-  console.log('[Results] orgPct:', orgPct, 'capPct:', capPct, 'archetype:', archetype)
-  console.log('[Archetype Debug] orgPct:', orgPct, 'capPct:', capPct, 'result:', assignArchetype(orgPct, capPct))
-  console.log('[Debug] orgScores:', JSON.stringify(orgScores))
-  console.log('[Debug] individualScores:', JSON.stringify(individualScores))
-  console.log('[Debug] qualitativeScores:', JSON.stringify(qualitativeScores))
-  console.log('[Debug] orgPct:', orgPct, 'capPct:', capPct, 'archetype:', archetype)
   const archetypeData = archetype ? ARCHETYPES[archetype] : null
   const priorities    = archetype ? PRIORITIES[archetype] : null
 
