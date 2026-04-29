@@ -404,7 +404,112 @@ export default function Results() {
           </div>
         </div>
 
-        {/* BLOCK 8 — CLOSING SCREEN */}
+        {/* BLOCK 8 — LEARNING PATHWAY */}
+        {trackRecommendation && (
+          <div className="mb-6">
+            <p className="text-[#00ADA9] text-xs font-bold uppercase tracking-widest mb-2">YOUR LEARNING PATHWAY</p>
+            <p className="text-gray-500 text-sm mb-6">Your assessment results map directly to PEOPLElogy's AI training tracks. Your recommended tracks are highlighted.</p>
+
+            <div className="space-y-3">
+              {TRACKS.map(track => {
+                const isPrimary   = trackRecommendation.primary   === track.id
+                const isSecondary = trackRecommendation.secondary === track.id
+                const isExpanded  = expandedTrack === track.id
+
+                return (
+                  <div
+                    key={track.id}
+                    className={`rounded-2xl overflow-hidden border transition-all duration-200 ${
+                      isPrimary   ? 'border-[#00ADA9] shadow-md' :
+                      isSecondary ? 'border-[#1B3A5C] shadow-sm' :
+                      'border-gray-200 opacity-60'
+                    }`}
+                  >
+                    <div
+                      className="flex items-center justify-between p-5 cursor-pointer bg-white"
+                      onClick={() => setExpandedTrack(isExpanded ? null : track.id)}
+                    >
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span
+                          className="text-xs font-bold px-3 py-1 rounded-full text-white flex-shrink-0"
+                          style={{ background: '#' + track.color }}
+                        >
+                          {track.label}
+                        </span>
+                        <span className="text-xs font-medium px-3 py-1 rounded-full bg-gray-100 text-gray-600 flex-shrink-0">
+                          {track.category}
+                        </span>
+                        <span className="text-[#1B3A5C] font-bold text-base">{track.name}</span>
+                        <span className="text-gray-400 text-sm hidden sm:block">— {track.tagline}</span>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0 ml-2">
+                        {isPrimary && (
+                          <span className="text-xs font-bold bg-[#E6FAF9] text-[#00ADA9] px-3 py-1 rounded-full hidden sm:block">
+                            RECOMMENDED
+                          </span>
+                        )}
+                        {isSecondary && (
+                          <span className="text-xs font-bold bg-[#e8edf3] text-[#1B3A5C] px-3 py-1 rounded-full hidden sm:block">
+                            ALSO RELEVANT
+                          </span>
+                        )}
+                        <svg
+                          className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                          fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </div>
+
+                    {isExpanded && (
+                      <div className="bg-gray-50 border-t border-gray-100 px-5 pb-6 pt-4">
+                        <div className="mb-4">
+                          <p className="text-xs font-bold uppercase tracking-wide text-gray-400 mb-1">OBJECTIVE</p>
+                          <p className="text-sm text-gray-600 leading-relaxed">{track.objective}</p>
+                        </div>
+                        <div className="mb-4">
+                          <p className="text-xs font-bold uppercase tracking-wide text-gray-400 mb-1">TARGET AUDIENCE</p>
+                          <p className="text-sm text-gray-600">{track.audience}</p>
+                        </div>
+                        <div className="mb-4">
+                          <p className="text-xs font-bold uppercase tracking-wide text-gray-400 mb-2">COURSES IN THIS TRACK</p>
+                          <div className="grid grid-cols-1 gap-1.5">
+                            {track.courses.map((course, i) => (
+                              <div key={i} className="flex items-center gap-2 text-sm text-[#1B3A5C]">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#00ADA9] flex-shrink-0"></span>
+                                {course}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold uppercase tracking-wide text-gray-400 mb-2">WHAT YOU WILL ACHIEVE</p>
+                          <div className="space-y-1">
+                            {track.outcomes.map((outcome, i) => (
+                              <div key={i} className="flex items-center gap-2 text-sm text-gray-600">
+                                <svg className="w-4 h-4 text-[#00ADA9] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                                {outcome}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+
+            <div className="mt-4 bg-[#E6FAF9] border border-[#00ADA9] rounded-xl p-4 text-sm text-[#1B3A5C] text-center">
+              PEOPLElogy offers all 4 tracks as open enrolment and corporate programmes. Talk to us to build your organisation's learning roadmap.
+            </div>
+          </div>
+        )}
+
+        {/* BLOCK 9 — CLOSING SCREEN */}
         <div className="bg-[#0D1F35] rounded-3xl p-8 text-center">
           {qualitativeScores?.q8BoldMove ? (
             <>
@@ -426,7 +531,7 @@ export default function Results() {
           </p>
         </div>
 
-        {/* BLOCK 9 — ACTION BUTTONS */}
+        {/* BLOCK 10 — ACTION BUTTONS */}
         <div className="flex gap-4 justify-center flex-wrap">
           <button
             type="button"
