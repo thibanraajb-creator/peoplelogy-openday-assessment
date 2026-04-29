@@ -30,7 +30,7 @@ export default function Results() {
     return null
   }
 
-  const orgPct       = orgScores ? orgScores.overallScore : 50
+  const orgPct       = orgScores ? orgScores.overallPercentage : 50
   const capPct       = individualScores ? Math.round(individualScores.overallAverage * 25) : 50
 
   const archetype     = qualitativeScores ? assignArchetype(orgPct, capPct) : null
@@ -42,8 +42,14 @@ export default function Results() {
   const pillarPcts   = orgScores ? orgScores.pillarScores.map(p => p.percentage) : []
   const minPct       = pillarPcts.length ? Math.min(...pillarPcts) : null
   const maxPct       = pillarPcts.length ? Math.max(...pillarPcts) : null
-  const allEqual     = minPct !== null && minPct === maxPct
-  const radarData    = PILLAR_NAMES.map((name, i) => ({ name, score: pillarPcts[i] ?? 0 }))
+  const allEqual     = minPct === maxPct
+  const radarData    = orgScores ? [
+    { name: 'Strategy',    score: orgScores.pillarScores[0].percentage },
+    { name: 'Data & Tech', score: orgScores.pillarScores[1].percentage },
+    { name: 'People',      score: orgScores.pillarScores[2].percentage },
+    { name: 'Processes',   score: orgScores.pillarScores[3].percentage },
+    { name: 'Governance',  score: orgScores.pillarScores[4].percentage },
+  ] : []
 
   // Individual-derived (capPct doubles as indPct for display)
   const indPct = capPct
