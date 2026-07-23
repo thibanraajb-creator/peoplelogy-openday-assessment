@@ -7,7 +7,6 @@ import Logo from '../components/Logo'
 import { ARCHETYPES, PRIORITIES } from '../data/archetypes'
 import { TRACKS, ARCHETYPE_TRACKS } from '../data/tracks'
 import { assignArchetype } from '../data/qualitativeQuestions'
-import { downloadParticipantReport } from '../lib/buildParticipantReport'
 
 const PILLAR_NAMES = ['Strategy', 'Data & Tech', 'People', 'Processes', 'Governance']
 
@@ -54,7 +53,8 @@ export default function Results() {
   // Individual-derived (capPct doubles as indPct for display)
   const indPct = capPct
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
+    const { downloadParticipantReport } = await import('../lib/buildParticipantReport')
     downloadParticipantReport({
       path,
       intake,
