@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAssessment } from '../context/AssessmentContext'
 import { RadarChart, PolarGrid, PolarAngleAxis, Radar, ResponsiveContainer, Tooltip } from 'recharts'
@@ -7,8 +7,7 @@ import Logo from '../components/Logo'
 import { ARCHETYPES, PRIORITIES } from '../data/archetypes'
 import { TRACKS, ARCHETYPE_TRACKS } from '../data/tracks'
 import { assignArchetype } from '../data/qualitativeQuestions'
-import html2canvas from 'html2canvas'
-import jsPDF from 'jspdf'
+import { downloadParticipantReport } from '../lib/buildParticipantReport'
 
 const PILLAR_NAMES = ['Strategy', 'Data & Tech', 'People', 'Processes', 'Governance']
 
@@ -22,7 +21,6 @@ const DIMENSIONS = [
 
 export default function Results() {
   const navigate = useNavigate()
-  const reportRef = useRef(null)
   const { assessmentData } = useAssessment()
   const { path, intake, orgScores, individualScores, qualitativeScores } = assessmentData
 
@@ -56,20 +54,26 @@ export default function Results() {
   // Individual-derived (capPct doubles as indPct for display)
   const indPct = capPct
 
-  const handleDownloadPDF = async () => {
-    const el = reportRef.current
-    if (!el) return
-    try {
-      const canvas = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: '#f9fafb' })
-      const imgData = canvas.toDataURL('image/png')
-      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
-      const pdfWidth = pdf.internal.pageSize.getWidth()
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight)
-      pdf.save('PEOPLElogy-AI-Report-' + intake.firstName + '.pdf')
-    } catch (err) {
-      alert('PDF error: ' + err.message)
-    }
+  const handleDownloadPDF = () => {
+    downloadParticipantReport({
+      path,
+      intake,
+      orgScores,
+      qualitative: qualitativeScores,
+      individual: individualScores,
+      archetype: archetypeData
+        ? {
+            name: archetype,
+            subtitle: archetypeData.subtitle,
+            narrative: archetypeData.narrative,
+            color: archetypeData.color,
+            priorities: priorities
+              ? priorities.map(p => ({ title: p.title, desc: p.detail }))
+              : null,
+          }
+        : null,
+      sessionLabel: 'Open Day JB · 5 May 2026',
+    })
   }
 
   return (
@@ -97,7 +101,7 @@ export default function Results() {
       <Confetti />
 
       {/* Report */}
-      <div ref={reportRef} className="max-w-3xl mx-auto px-6 py-8 space-y-6">
+      <div className="max-w-3xl mx-auto px-6 py-8 space-y-6">
 
         {/* BLOCK 1 — HEADER CARD */}
         <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
