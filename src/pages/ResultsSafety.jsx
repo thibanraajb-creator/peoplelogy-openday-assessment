@@ -3,7 +3,6 @@ import { useAssessment } from '../context/AssessmentContext'
 import Confetti from '../components/Confetti'
 import Logo from '../components/Logo'
 import { TIER_DETAIL } from '../data/safetyTiers'
-import { EVENT_LABEL } from '../data/eventConfig'
 
 export default function ResultsSafety() {
   const navigate = useNavigate()
@@ -36,7 +35,7 @@ export default function ResultsSafety() {
 
   const handleDownload = async () => {
     const { downloadSafetyReport } = await import('../lib/buildSafetyReport')
-    downloadSafetyReport({ intake, scores, sessionLabel: EVENT_LABEL })
+    downloadSafetyReport({ intake, scores, sessionLabel: null })
   }
 
   return (
@@ -70,7 +69,7 @@ export default function ResultsSafety() {
         <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
           <h1 className="text-[#1B3A5C] font-black text-2xl">Your AI Safety Capacity Report</h1>
           <p className="text-gray-500 text-sm">{intake.firstName} from {intake.organisation}</p>
-          <p className="text-gray-400 text-xs">{EVENT_LABEL} · {new Date().toLocaleDateString()}</p>
+          <p className="text-gray-400 text-xs">{new Date().toLocaleDateString()}</p>
         </div>
 
         {/* BLOCK 2 — CAPACITY BAND HERO */}

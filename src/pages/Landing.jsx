@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import Logo from '../components/Logo'
 import NeuralNetwork from '../components/NeuralNetwork'
 import { supabase, SESSION_CODE } from '../lib/supabase'
-import { EVENT_LABEL } from '../data/eventConfig'
 
 const FULL_TEXT = 'AI Readiness'
 
@@ -41,16 +40,6 @@ function ShieldIcon() {
     <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="#00ADA9" strokeWidth="1.5">
       <path strokeLinecap="round" strokeLinejoin="round"
         d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-    </svg>
-  )
-}
-
-function LocationIcon() {
-  return (
-    <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-      <path strokeLinecap="round" strokeLinejoin="round"
-        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
     </svg>
   )
 }
@@ -269,16 +258,6 @@ export default function Landing() {
         }}
       >
         <Logo height={36} />
-        <span
-          className="text-xs font-semibold px-4 py-1.5 rounded-full"
-          style={{
-            background: 'rgba(0,173,169,0.15)',
-            border: '1px solid rgba(0,173,169,0.3)',
-            color: '#00ADA9',
-          }}
-        >
-          {EVENT_LABEL}
-        </span>
       </nav>
 
       {/* Hero */}
@@ -345,18 +324,6 @@ export default function Landing() {
               Get your personal report instantly.
             </p>
 
-            {/* Location badge */}
-            <div
-              className="inline-flex items-center gap-2 text-sm font-medium px-5 py-2.5 rounded-full mb-10"
-              style={{
-                background: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                color: 'rgba(255,255,255,0.7)',
-              }}
-            >
-              <LocationIcon />
-              {EVENT_LABEL}
-            </div>
 
             {/* Live counter stat bar */}
             <div

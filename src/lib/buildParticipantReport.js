@@ -19,7 +19,6 @@
  */
 
 import { Doc, T } from './reportRenderer'
-import { EVENT_LABEL } from '../data/eventConfig'
 
 /* =============================================================
  * CONTENT CONSTANTS
@@ -201,7 +200,7 @@ export function buildParticipantReport(data) {
     qualitative = null,
     individual = null,
     archetype = null,
-    sessionLabel = EVENT_LABEL,
+    sessionLabel = null,
   } = data
 
   const hasOrg = !!orgScores && (path === 'org' || path === 'full')
@@ -225,7 +224,7 @@ export function buildParticipantReport(data) {
   d.docHeader({
     title: 'Your AI Readiness Report',
     subtitle: org ? `${name} from ${org}` : name,
-    meta: `${sessionLabel} · ${today}`,
+    meta: sessionLabel ? `${sessionLabel} · ${today}` : today,
   })
 
   /* ---------- BLOCK 1: ARCHETYPE (org + full) ---------- */

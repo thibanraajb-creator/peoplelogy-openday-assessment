@@ -7,7 +7,6 @@ import Logo from '../components/Logo'
 import { ARCHETYPES, PRIORITIES } from '../data/archetypes'
 import { TRACKS, ARCHETYPE_TRACKS } from '../data/tracks'
 import { assignArchetype } from '../data/qualitativeQuestions'
-import { EVENT_LABEL } from '../data/eventConfig'
 
 const PILLAR_NAMES = ['Strategy', 'Data & Tech', 'People', 'Processes', 'Governance']
 
@@ -73,7 +72,6 @@ export default function Results() {
               : null,
           }
         : null,
-      sessionLabel: EVENT_LABEL,
     })
   }
 
@@ -108,7 +106,7 @@ export default function Results() {
         <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
           <h1 className="text-[#1B3A5C] font-black text-2xl">Your AI Readiness Report</h1>
           <p className="text-gray-500 text-sm">{intake.firstName} from {intake.organisation}</p>
-          <p className="text-gray-400 text-xs">{EVENT_LABEL} · {new Date().toLocaleDateString()}</p>
+          <p className="text-gray-400 text-xs">{new Date().toLocaleDateString()}</p>
         </div>
 
         {/* BLOCK 2 — ARCHETYPE BANNER */}

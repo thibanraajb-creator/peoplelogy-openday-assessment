@@ -6,7 +6,6 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, Cell, CartesianGrid,
 } from 'recharts'
 import Logo from '../components/Logo'
-import { EVENT_LABEL } from '../data/eventConfig'
 
 const MATURITY_LABELS = {
   1: 'Awareness', 2: 'Exploration', 3: 'Operational', 4: 'Integrated', 5: 'AI-Driven',
@@ -188,7 +187,6 @@ export default function Dashboard() {
       <div className="max-w-6xl mx-auto px-6 py-8">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-[#1B3A5C]">Live Dashboard</h1>
-          <p className="text-gray-500 text-sm">{EVENT_LABEL}</p>
         </div>
 
         {fetchError && (

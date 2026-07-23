@@ -7,7 +7,6 @@ import {
   GOVERNANCE_QUESTION,
   computeSafetyScores,
 } from '../data/safetyQuestions'
-import { EVENT_LABEL } from '../data/eventConfig'
 import { supabase, SESSION_CODE } from '../lib/supabase'
 import Logo from '../components/Logo'
 
@@ -139,9 +138,6 @@ export default function SurveySafety() {
 
         {/* Intro */}
         <div className="mb-6">
-          <p className="text-[#00ADA9] text-xs font-bold uppercase tracking-widest mb-1">
-            {EVENT_LABEL}
-          </p>
           <h1 className="text-[#1B3A5C] font-black text-2xl mb-1">AI Safety Capacity &amp; Digital Trust</h1>
           <p className="text-gray-500 text-sm">
             Three pillars — AI Safety, Digital Trust, and Resilience. Answer honestly; there are no right answers.

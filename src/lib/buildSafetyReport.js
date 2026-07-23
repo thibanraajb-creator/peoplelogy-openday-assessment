@@ -120,7 +120,7 @@ export function buildSafetyReport(data) {
   d.docHeader({
     title: 'AI Safety Capacity & Digital Trust',
     subtitle: org ? `${name} from ${org}` : name,
-    meta: `${sessionLabel} · ${today}`,
+    meta: sessionLabel ? `${sessionLabel} · ${today}` : today,
   })
 
   /* ---------- HERO: capacity band ---------- */

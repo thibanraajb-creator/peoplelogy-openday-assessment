@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase, SESSION_CODE } from '../lib/supabase'
-import { EVENT_LABEL } from '../data/eventConfig'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, Cell, ResponsiveContainer,
 } from 'recharts'
@@ -144,7 +143,6 @@ export default function Facilitator() {
             PEOPLE<span style={{ color: '#00ADA9' }}>logy</span>
           </span>
         </div>
-        <span className="text-white/70 text-lg font-semibold">{EVENT_LABEL}</span>
         <div className="flex items-center gap-4">
           {lastUpdated && (
             <span className="text-white/30 text-sm">{lastUpdated.toLocaleTimeString()}</span>
