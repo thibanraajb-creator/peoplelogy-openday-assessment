@@ -48,12 +48,14 @@ const PATH_BADGE = {
   org:        'My Organisation',
   individual: 'My Capability',
   full:       'Full Assessment',
+  safety:     'AI Safety & Digital Trust',
 }
 
 const SUBMIT_LABEL = {
   org:        'Start Organisation Assessment',
   individual: 'Start Personal Assessment',
   full:       'Start Full Assessment',
+  safety:     'Start Safety Assessment',
 }
 
 const INPUT_CLS =
@@ -126,6 +128,7 @@ export default function Intake() {
     updateIntake(form)   // cluster auto-assigned inside context
 
     if (path === 'individual') navigate('/survey/qualitative')
+    else if (path === 'safety') navigate('/survey/safety')
     else navigate('/survey/org')
   }
 

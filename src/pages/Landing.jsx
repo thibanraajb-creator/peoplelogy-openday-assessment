@@ -35,6 +35,15 @@ function ChartIcon() {
   )
 }
 
+function ShieldIcon() {
+  return (
+    <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="#00ADA9" strokeWidth="1.5">
+      <path strokeLinecap="round" strokeLinejoin="round"
+        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+    </svg>
+  )
+}
+
 function LocationIcon() {
   return (
     <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
@@ -405,7 +414,7 @@ export default function Landing() {
 
       {/* Path cards */}
       <section className="max-w-7xl mx-auto px-8 pb-20" style={{ marginTop: '48px' }}>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
           <PathCard
             icon={<BuildingIcon />}
             title="My Organisation's Readiness"
@@ -431,6 +440,14 @@ export default function Landing() {
             time="~18 minutes · 40 questions"
             buttonText="Start Full Assessment →"
             onClick={() => handleStart('full')}
+          />
+          <PathCard
+            icon={<ShieldIcon />}
+            title="AI Safety Capacity & Digital Trust"
+            description="Assess your readiness across AI safety, digital trust, and resilience — deepfake defence, output verification, and AI incident response."
+            time="16 questions · about 7 minutes"
+            buttonText="Start Safety Assessment →"
+            onClick={() => handleStart('safety')}
           />
         </div>
       </section>
