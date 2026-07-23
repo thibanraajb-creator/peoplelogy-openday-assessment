@@ -121,11 +121,33 @@ export default function ResultsSafety() {
           </div>
         </div>
 
-        {/* BLOCK 4 — PRIMARY FOCUS */}
-        <div className="bg-[#E6FAF9] border border-[#00ADA9] rounded-2xl p-5">
-          <p className="text-[#00ADA9] font-bold text-sm mb-1">Your priority: {primaryFocus}</p>
-          <p className="text-[#1B3A5C] text-sm leading-relaxed">{primaryFocusDetail}</p>
-        </div>
+        {/* BLOCK 4 — PRIMARY FOCUS
+            Mirrors buildSafetyReport.js: on a flat profile there is no
+            genuine weakest pillar, so the focus is suppressed and reframed
+            to match the capacity band instead of contradicting it. */}
+        {primaryFocus && primaryFocusDetail ? (
+          <div className="bg-[#E6FAF9] border border-[#00ADA9] rounded-2xl p-5">
+            <p className="text-[#00ADA9] font-bold text-sm mb-1">Your priority: {primaryFocus}</p>
+            <p className="text-[#1B3A5C] text-sm leading-relaxed">{primaryFocusDetail}</p>
+          </div>
+        ) : capacityLabel === 'Resilient' ? (
+          <div className="rounded-2xl p-5 border" style={{ background: '#E8F8EE', borderColor: '#22C55E' }}>
+            <p className="font-bold text-sm mb-1" style={{ color: '#22C55E' }}>Your priority: sustain and extend</p>
+            <p className="text-[#1B3A5C] text-sm leading-relaxed">
+              Your three pillars are evenly developed and all at a strong level. There is no single weak area to address.
+              The priority is holding this standard as threats evolve, and extending the same practice to teams and functions
+              that have not yet reached it.
+            </p>
+          </div>
+        ) : (
+          <div className="bg-[#E6FAF9] border border-[#00ADA9] rounded-2xl p-5">
+            <p className="text-[#00ADA9] font-bold text-sm mb-1">Your priority: build across all three pillars</p>
+            <p className="text-[#1B3A5C] text-sm leading-relaxed">
+              Your three pillars are evenly developed, so there is no single weakest area to target first. Build capability
+              across safety, trust, and resilience together rather than sequencing one ahead of the others.
+            </p>
+          </div>
+        )}
 
         {/* BLOCK 5 — RECOMMENDED TIER */}
         <div>
