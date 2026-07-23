@@ -19,6 +19,7 @@
  */
 
 import { Doc, T } from './reportRenderer'
+import { EVENT_LABEL } from '../data/eventConfig'
 
 /* =============================================================
  * CONTENT CONSTANTS
@@ -200,7 +201,7 @@ export function buildParticipantReport(data) {
     qualitative = null,
     individual = null,
     archetype = null,
-    sessionLabel = 'Open Day JB',
+    sessionLabel = EVENT_LABEL,
   } = data
 
   const hasOrg = !!orgScores && (path === 'org' || path === 'full')

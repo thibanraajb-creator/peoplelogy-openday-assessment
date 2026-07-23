@@ -6,6 +6,7 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, Cell, CartesianGrid,
 } from 'recharts'
 import Logo from '../components/Logo'
+import { EVENT_LABEL } from '../data/eventConfig'
 
 const MATURITY_LABELS = {
   1: 'Awareness', 2: 'Exploration', 3: 'Operational', 4: 'Integrated', 5: 'AI-Driven',
@@ -187,7 +188,7 @@ export default function Dashboard() {
       <div className="max-w-6xl mx-auto px-6 py-8">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-[#1B3A5C]">Live Dashboard</h1>
-          <p className="text-gray-500 text-sm">Open Day JB · 5 May 2026 · Session JBOPEN2026</p>
+          <p className="text-gray-500 text-sm">{EVENT_LABEL}</p>
         </div>
 
         {fetchError && (
@@ -222,7 +223,6 @@ export default function Dashboard() {
               <div className="text-center py-16 bg-white rounded-2xl border border-gray-100">
                 <h3 className="text-[#1B3A5C] font-semibold mb-2">No responses yet</h3>
                 <p className="text-gray-400 text-sm">Results will appear here as participants complete the assessment.</p>
-                <p className="text-gray-300 text-xs mt-2">Session: {SESSION_CODE}</p>
               </div>
             ) : (
               <>

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase, SESSION_CODE } from '../lib/supabase'
+import { EVENT_LABEL } from '../data/eventConfig'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, Cell, ResponsiveContainer,
 } from 'recharts'
@@ -143,7 +144,7 @@ export default function Facilitator() {
             PEOPLE<span style={{ color: '#00ADA9' }}>logy</span>
           </span>
         </div>
-        <span className="text-white/70 text-lg font-semibold">Open Day JB · 5 May 2026</span>
+        <span className="text-white/70 text-lg font-semibold">{EVENT_LABEL}</span>
         <div className="flex items-center gap-4">
           {lastUpdated && (
             <span className="text-white/30 text-sm">{lastUpdated.toLocaleTimeString()}</span>
@@ -173,7 +174,6 @@ export default function Facilitator() {
             <div className="text-8xl font-black text-white/10 mb-4">0</div>
             <h2 className="text-white/50 text-2xl font-semibold mb-2">Waiting for responses</h2>
             <p className="text-white/30 text-base">Results will appear here as participants complete the assessment.</p>
-            <p className="text-white/20 text-sm mt-2">Session: {SESSION_CODE}</p>
           </div>
         </div>
       ) : (

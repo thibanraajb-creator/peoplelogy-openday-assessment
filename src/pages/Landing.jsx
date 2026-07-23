@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Logo from '../components/Logo'
 import NeuralNetwork from '../components/NeuralNetwork'
 import { supabase, SESSION_CODE } from '../lib/supabase'
+import { EVENT_LABEL } from '../data/eventConfig'
 
 const FULL_TEXT = 'AI Readiness'
 
@@ -276,7 +277,7 @@ export default function Landing() {
             color: '#00ADA9',
           }}
         >
-          Open Day JB · 5 May 2026
+          {EVENT_LABEL}
         </span>
       </nav>
 
@@ -354,7 +355,7 @@ export default function Landing() {
               }}
             >
               <LocationIcon />
-              Open Day JB · 5 May 2026 · Johor Bahru
+              {EVENT_LABEL}
             </div>
 
             {/* Live counter stat bar */}
