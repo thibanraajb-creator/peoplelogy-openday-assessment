@@ -675,7 +675,10 @@ export class Doc {
    * Keeps the cross-sell catalogue present without diluting the
    * two recommended tracks above it.
    */
-  comparisonTable({ rows, highlight = [] }) {
+  /* `countHeader` labels the numeric column. The productivity report
+     counts courses; the safety report shows contact hours. Shared
+     primitive, so the caller names it. */
+  comparisonTable({ rows, highlight = [], countHeader = 'COURSES' }) {
     const colW = [46, 62, 18, 52]   // Track | Audience | Courses | Focus
     const headH = 7
 
@@ -685,7 +688,7 @@ export class Doc {
     this._fill(T.navy)
     this.pdf.roundedRect(M, this.y, CONTENT_W, headH, 1.5, 1.5, 'F')
     this._font(6.8, 'bold'); this._text(T.white)
-    const heads = ['TRACK', 'WHO IT IS FOR', 'COURSES', 'FOCUS']
+    const heads = ['TRACK', 'WHO IT IS FOR', countHeader, 'FOCUS']
     let hx = M + 3
     heads.forEach((hd, i) => {
       this.pdf.text(hd, hx, this.y + 4.6)

@@ -20,23 +20,26 @@ export const SAFETY_PILLARS = [
   {
     key: 'P1',
     name: 'AI Safety',
-    short: 'Safety',
+    abbr: 'Safety',
     color: '#00ADA9',
     definition: 'Ensuring AI systems behave reliably and do not cause harm — managing bias, hallucination, and unsafe or unreliable outputs, and keeping meaningful human oversight and control.',
+    short: 'Reliable outputs, human oversight, and control',
   },
   {
     key: 'P2',
     name: 'Digital Trust',
-    short: 'Trust',
+    abbr: 'Trust',
     color: '#3B82F6',
     definition: 'Preserving trust in identity, content, and transactions in an era of deepfakes and synthetic media — through verification, provenance, and data integrity.',
+    short: 'Deepfakes, identity, provenance, and data integrity',
   },
   {
     key: 'P3',
     name: 'Resilience',
-    short: 'Resilience',
+    abbr: 'Resilience',
     color: '#7C3AED',
     definition: 'The operational capacity to secure AI systems and to withstand, detect, respond to, and recover from AI-related threats and failures.',
+    short: 'Securing AI, detecting incidents, and recovering',
   },
 ]
 
@@ -324,7 +327,7 @@ export function computeSafetyScores(responses = {}, cluster = 'A', governance = 
   const pillarScores = SAFETY_PILLARS.map(p => ({
     key: p.key,
     name: p.name,
-    short: p.short,
+    abbr: p.abbr,
     color: p.color,
     sum: pillarSums[p.key],
     percentage: Math.max(0, Math.min(100, pct(pillarSums[p.key]))),
@@ -340,6 +343,12 @@ export function computeSafetyScores(responses = {}, cluster = 'A', governance = 
   const weakest = pillarScores.reduce((lo, p) => (p.percentage < lo.percentage ? p : lo), pillarScores[0])
   const strongest = pillarScores.reduce((hi, p) => (p.percentage > hi.percentage ? p : hi), pillarScores[0])
 
+  // A flat profile has no meaningful "weakest" pillar. Without this the
+  // report told a 100%/100%/100% respondent that their weakest area was
+  // AI Safety and instructed them to start verifying outputs — advice
+  // that contradicts the Resilient band printed directly above it.
+  const isFlat = strongest.percentage === weakest.percentage
+
   const tierNumber = assignTier(cluster, governance)
 
   const urgency =
@@ -353,11 +362,14 @@ export function computeSafetyScores(responses = {}, cluster = 'A', governance = 
     capacityLabel: band.label,
     capacityColor: band.color,
     capacitySummary: band.summary,
-    weakestPillar: weakest.key,
-    weakestPillarName: weakest.name,
-    strongestPillarName: strongest.name,
-    primaryFocus: PILLAR_FOCUS[weakest.key],
-    primaryFocusDetail: PILLAR_FOCUS_DETAIL[weakest.key],
+    weakestPillar: isFlat ? null : weakest.key,
+    weakestPillarName: isFlat ? null : weakest.name,
+    strongestPillarName: isFlat ? null : strongest.name,
+    isFlat,
+    // suppressed on a flat profile; reframed at the top band so the
+    // advice matches the score instead of contradicting it
+    primaryFocus: isFlat ? null : PILLAR_FOCUS[weakest.key],
+    primaryFocusDetail: isFlat ? null : PILLAR_FOCUS_DETAIL[weakest.key],
     tierNumber,
     tier: TIERS[tierNumber],
     urgency,

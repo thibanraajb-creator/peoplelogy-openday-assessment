@@ -17,13 +17,63 @@ import {
   TIERS,
   ALL_FRAMEWORKS,
 } from '../data/safetyQuestions'
-import { TIER_DETAIL } from '../data/safetyTiers'
 
-/* TIER_DETAIL (objective / modules / outcomes) lives in
-   ../data/safetyTiers so the on-screen results page can render it
-   without importing this jsPDF-backed module. Re-exported here for
-   any existing importers. */
-export { TIER_DETAIL }
+/* Tier detail from the programme document — used for the expanded block. */
+const TIER_DETAIL = {
+  1: {
+    objective: 'Give every member of the organisation a working understanding of AI safety, digital trust, and resilience, and the habits to use AI safely and responsibly.',
+    modules: [
+      'Welcome & National Context',
+      'Pillar 1 — AI Safety: When AI Gets It Wrong',
+      'Pillar 2 — Digital Trust: Deepfakes, Identity & What to Believe',
+      'Pillar 3 — Resilience: Securing AI & Staying Safe',
+      'Applied — Safe & Responsible AI in Your Daily Work',
+      'Closing — Your Safe-AI Commitments & National Alignment',
+    ],
+    outcomes: [
+      'Recognise AI safety risks and when to question outputs',
+      'Spot deepfake and identity threats',
+      'Understand AI security and responsible use',
+      'Apply safe practices in daily work',
+    ],
+  },
+  2: {
+    objective: 'Equip technical staff to test AI systems for safety, secure them against AI-specific threats, defend digital trust, and operate them resiliently.',
+    modules: [
+      'Day 1 — AI Safety Engineering: failure modes, red-teaming, guardrails',
+      'Day 2 — Digital Trust & AI Security: securing the AI stack, OWASP LLM Top 10',
+      'Day 2 — Deepfake & synthetic-media defence, e-KYC protection',
+      'Day 3 — Threat modelling, monitoring, detection & response',
+      'Day 3 — Secure deployment & AI security operations',
+      'Hands-on labs each day, closing with an incident-response simulation',
+    ],
+    outcomes: [
+      'Test AI systems for safety and robustness',
+      'Conduct AI red-teaming',
+      'Secure AI against OWASP LLM threats',
+      'Detect deepfakes and defend identity',
+      'Build AI incident detection and response',
+    ],
+  },
+  3: {
+    objective: "Enable leaders and governance officers to build, run, and lead an organisational AI governance posture aligned to Malaysia's national framework.",
+    modules: [
+      'Day 1 — The AI Governance Landscape: AIGE, NAIO, PDPA, NIST, ISO/IEC 42001',
+      'Day 1 — Risk-based AI governance and control matching',
+      'Day 1 — Roles, accountability & operating model',
+      'Day 2 — Policies & assurance; third-party and vendor AI risk',
+      'Day 2 — Leadership, board reporting & culture',
+      'Hands-on: map your AI risk landscape, draft your governance roadmap',
+    ],
+    outcomes: [
+      'Build an AI governance framework',
+      'Apply AIGE and international standards',
+      'Establish risk assessment and assurance',
+      'Manage third-party AI risk',
+      'Lead accountable AI adoption',
+    ],
+  },
+}
 
 const URGENCY_COPY = {
   Immediate: {
@@ -95,7 +145,10 @@ export function buildSafetyReport(data) {
     d.barRow({
       label: p.name,
       value: p.percentage,
-      note: def ? def.definition.split('—')[1]?.trim().slice(0, 96) : undefined,
+      // `short` is a hand-written descriptor. The previous version split the
+      // long definition on an em-dash and truncated at 96 chars, which cut
+      // mid-word and rendered nothing at all for Resilience (no em-dash).
+      note: def ? def.short : undefined,
       badge: allEqual ? null
         : p.percentage === minP ? 'Focus Area'
         : p.percentage === maxP ? 'Strength' : null,
@@ -107,12 +160,31 @@ export function buildSafetyReport(data) {
   const u = URGENCY_COPY[scores.urgency] || URGENCY_COPY.High
   d.calloutBox({ title: `${scores.urgency} priority`, text: u.text, accent: u.accent, tint: u.tint })
 
-  /* ---------- PRIMARY FOCUS ---------- */
-  d.calloutBox({
-    title: `Your priority: ${scores.primaryFocus}`,
-    text: scores.primaryFocusDetail,
-    accent: T.teal, tint: '#E6F7F6',
-  })
+  /* ---------- PRIMARY FOCUS ----------
+     Suppressed when the profile is flat (no genuine weakest pillar) and
+     reframed at the top band. Previously a 100/100/100 respondent was
+     told their weakest area was AI Safety and instructed to start
+     verifying outputs — directly contradicting the Resilient band and
+     the Maintain priority printed above it. */
+  if (scores.primaryFocus && scores.primaryFocusDetail) {
+    d.calloutBox({
+      title: `Your priority: ${scores.primaryFocus}`,
+      text: scores.primaryFocusDetail,
+      accent: T.teal, tint: '#E6F7F6',
+    })
+  } else if (scores.capacityLabel === 'Resilient') {
+    d.calloutBox({
+      title: 'Your priority: sustain and extend',
+      text: 'Your three pillars are evenly developed and all at a strong level. There is no single weak area to address. The priority is holding this standard as threats evolve, and extending the same practice to teams and functions that have not yet reached it.',
+      accent: T.green, tint: '#E8F8EE',
+    })
+  } else {
+    d.calloutBox({
+      title: 'Your priority: build across all three pillars',
+      text: 'Your three pillars are evenly developed, so there is no single weakest area to target first. Build capability across safety, trust, and resilience together rather than sequencing one ahead of the others.',
+      accent: T.teal, tint: '#E6F7F6',
+    })
+  }
 
   /* ---------- RECOMMENDED TIER ---------- */
   const tier = scores.tier || TIERS[1]
@@ -150,13 +222,16 @@ export function buildSafetyReport(data) {
   d.sectionLabel('The Full Capability Ladder', T.navy)
   d.comparisonTable({
     highlight: [tier.number],
+    countHeader: 'HOURS',
     rows: [1, 2, 3].map(n => ({
       number: n,
       name: TIERS[n].name,
       category: TIERS[n].duration,
       color: TIERS[n].color,
       audience: TIERS[n].audience,
-      courseCount: TIER_DETAIL[n].modules.length,
+      // was modules.length — printed "6" for all three tiers, which
+      // told the reader nothing. Contact hours differentiate them.
+      courseCount: TIERS[n].hours + 'h',
       focus: TIERS[n].focus,
     })),
   })
