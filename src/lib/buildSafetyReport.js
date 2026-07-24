@@ -13,7 +13,6 @@
 import { Doc, T } from './reportRenderer'
 import {
   SAFETY_PILLARS,
-  SAFETY_QUESTIONS,
   TIERS,
   ALL_FRAMEWORKS,
 } from '../data/safetyQuestions'
@@ -198,6 +197,13 @@ export function buildSafetyReport(data) {
      without the reasoning gives the reader no way to judge whether the
      instrument understood them, and no answer when a colleague asks why
      they were placed differently. */
+  if (scores.moduleLabel) {
+    d.paragraph(
+      'You answered the ' + String(scores.moduleLabel).toLowerCase() +
+      ' question set — nine questions shared by all participants, plus six written specifically for your function.',
+      { size: 8.4 }
+    )
+  }
   d.calloutBox({
     title: scores.tierBasis || 'Based on your role',
     text: scores.tierReason ||

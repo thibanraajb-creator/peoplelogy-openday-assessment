@@ -1,55 +1,51 @@
 /**
- * safetyQuestions.js
+ * safetyQuestions.js  (v2 — shared core + role module)
  * ---------------------------------------------------------------
- * AI Safety Capacity & Digital Trust Readiness — third assessment path.
+ * AI Safety Capacity & Digital Trust diagnostic.
  *
- * 15 scored questions (5 per pillar) + 1 routing question.
- * Tier routing reuses intake.cluster (A-E) — no new intake field.
+ * ARCHITECTURE
+ *   9 CORE questions   — identical for everyone, 3 per pillar.
+ *                        These produce the comparable national score.
+ *                        Without them, respondents answering different
+ *                        questions cannot be aggregated and the cohort
+ *                        dashboard loses its headline figure.
  *
- * Source: "Building AI Safety Capacity & Digital Trust Resilience"
- * three-pillar tiered programme (PEOPLElogy Berhad).
+ *   6 ROLE questions   — 2 per pillar, drawn from one of three modules
+ *                        matched to the participant's function. These
+ *                        give depth appropriate to the role and make the
+ *                        tier recommendation coherent with what was asked.
  *
- * SCORING NOTE: pillar percentage uses TRUE 0-100 normalisation,
- *   (sum - 5) / 15 * 100
- * NOT sum/20*100. The org path uses the un-normalised form, which
- * makes its bottom tier mathematically unreachable. Do not repeat it.
+ *   1 ROUTING question — governance responsibility (not scored).
+ *
+ *   Total 16 questions. Completion time unchanged.
+ *
+ * SCORING
+ *   core pillar   — 3 questions, sum 3-12  -> (sum-3)/9*100
+ *   pillar total  — 5 questions, sum 5-20  -> (sum-5)/15*100
+ *   Both use TRUE 0-100 normalisation. Never sum/max*100.
  * ---------------------------------------------------------------
  */
 
 export const SAFETY_PILLARS = [
-  {
-    key: 'P1',
-    name: 'AI Safety',
-    abbr: 'Safety',
-    color: '#00ADA9',
-    definition: 'Ensuring AI systems behave reliably and do not cause harm — managing bias, hallucination, and unsafe or unreliable outputs, and keeping meaningful human oversight and control.',
+  { key: 'P1', name: 'AI Safety', abbr: 'Safety', color: '#00ADA9',
     short: 'Reliable outputs, human oversight, and control',
-  },
-  {
-    key: 'P2',
-    name: 'Digital Trust',
-    abbr: 'Trust',
-    color: '#3B82F6',
-    definition: 'Preserving trust in identity, content, and transactions in an era of deepfakes and synthetic media — through verification, provenance, and data integrity.',
+    definition: 'Ensuring AI systems behave reliably and do not cause harm — managing bias, hallucination, and unsafe or unreliable outputs, and keeping meaningful human oversight and control.' },
+  { key: 'P2', name: 'Digital Trust', abbr: 'Trust', color: '#3B82F6',
     short: 'Deepfakes, identity, provenance, and data integrity',
-  },
-  {
-    key: 'P3',
-    name: 'Resilience',
-    abbr: 'Resilience',
-    color: '#7C3AED',
-    definition: 'The operational capacity to secure AI systems and to withstand, detect, respond to, and recover from AI-related threats and failures.',
+    definition: 'Preserving trust in identity, content, and transactions in an era of deepfakes and synthetic media — through verification, provenance, and data integrity.' },
+  { key: 'P3', name: 'Resilience', abbr: 'Resilience', color: '#7C3AED',
     short: 'Securing AI, detecting incidents, and recovering',
-  },
+    definition: 'The operational capacity to secure AI systems and to withstand, detect, respond to, and recover from AI-related threats and failures.' },
 ]
 
-/* Every question carries `module` and `frameworks` so the report can
-   print framework traceability. For a ministry audience this is what
-   separates a validated instrument from a survey. */
-export const SAFETY_QUESTIONS = [
-  /* ---------------- PILLAR 1 — AI SAFETY ---------------- */
+/* =============================================================
+   CORE — 9 questions, answered by everyone.
+   Deliberately answerable by any role, so a frontline officer and a
+   security engineer produce comparable numbers.
+   ============================================================= */
+export const CORE_QUESTIONS = [
   {
-    id: 's1', pillar: 'P1', col: 'p1_q1',
+    id: 'c_s1', pillar: 'P1', col: 'p1_q1',
     module: 'Tier 1 · Pillar 1 — How AI fails: bias, hallucination, and unreliable outputs',
     frameworks: ['AIGE'],
     text: 'Have you ever received an AI output that was confidently stated but factually wrong?',
@@ -61,7 +57,7 @@ export const SAFETY_QUESTIONS = [
     ],
   },
   {
-    id: 's2', pillar: 'P1', col: 'p1_q2',
+    id: 'c_s2', pillar: 'P1', col: 'p1_q2',
     module: 'Tier 1 · Pillar 1 — Why human oversight and judgment remain essential',
     frameworks: ['AIGE', 'NIST AI RMF'],
     text: 'Before an AI-generated output is used in a decision, document, or communication that leaves your team — what happens?',
@@ -73,7 +69,7 @@ export const SAFETY_QUESTIONS = [
     ],
   },
   {
-    id: 's3', pillar: 'P1', col: 'p1_q3',
+    id: 'c_s3', pillar: 'P1', col: 'p1_q3',
     module: 'Tier 1 · Pillar 1 — Recognising when to trust, and when to question, an AI output',
     frameworks: ['AIGE'],
     text: 'How confident are you in judging when an AI output should NOT be trusted?',
@@ -85,33 +81,7 @@ export const SAFETY_QUESTIONS = [
     ],
   },
   {
-    id: 's4', pillar: 'P1', col: 'p1_q4',
-    module: 'Tier 2 Day 1 — Establishing acceptance criteria and human-in-the-loop checkpoints',
-    frameworks: ['NIST AI RMF', 'ISO/IEC 42001'],
-    text: 'Does your organisation define what "good enough" means before an AI tool is used for anything consequential?',
-    options: [
-      { text: 'Yes — there are documented acceptance criteria and checkpoints by risk level', score: 4 },
-      { text: 'Partly — some teams have set standards, but it is not organisation-wide', score: 3 },
-      { text: 'No — but there is an informal sense of where AI should not be used', score: 2 },
-      { text: 'No — AI tools are used wherever people find them useful', score: 1 },
-    ],
-  },
-  {
-    id: 's5', pillar: 'P1', col: 'p1_q5',
-    module: 'Tier 2 Day 1 — Guardrails, safe-by-design controls, and safety testing in the lifecycle',
-    frameworks: ['NIST AI RMF', 'ISO/IEC 42001'],
-    text: 'When your organisation adopts a new AI tool or feature, is it tested for unsafe or biased behaviour before people use it?',
-    options: [
-      { text: 'Yes — there is a structured safety evaluation, including adversarial testing', score: 4 },
-      { text: 'Somewhat — it is trialled and reviewed, but not tested for unsafe behaviour specifically', score: 3 },
-      { text: 'Rarely — tools are adopted based on usefulness and vendor assurances', score: 2 },
-      { text: 'Never — or I do not know whether this happens', score: 1 },
-    ],
-  },
-
-  /* ---------------- PILLAR 2 — DIGITAL TRUST ---------------- */
-  {
-    id: 't1', pillar: 'P2', col: 'p2_q1',
+    id: 'c_t1', pillar: 'P2', col: 'p2_q1',
     module: 'Tier 1 · Pillar 2 — Deepfakes, voice cloning, and synthetic identity explained',
     frameworks: ['CyberSecurity Malaysia'],
     text: 'How confident are you that you could recognise a deepfake video or a cloned voice of someone you know?',
@@ -123,7 +93,7 @@ export const SAFETY_QUESTIONS = [
     ],
   },
   {
-    id: 't2', pillar: 'P2', col: 'p2_q2',
+    id: 'c_t2', pillar: 'P2', col: 'p2_q2',
     module: 'Tier 1 · Pillar 2 — Real threats in Malaysia: deepfake scams and executive impersonation',
     frameworks: ['CyberSecurity Malaysia'],
     text: 'If you received an urgent voice message or video call from a senior leader instructing you to make a payment or release information — what would you do?',
@@ -135,31 +105,7 @@ export const SAFETY_QUESTIONS = [
     ],
   },
   {
-    id: 't3', pillar: 'P2', col: 'p2_q3',
-    module: 'Tier 1 · Pillar 2 / Tier 2 Day 2 — Provenance, watermarking, and authentication standards',
-    frameworks: ['AIGE', 'CyberSecurity Malaysia'],
-    text: 'Does your organisation have any way of establishing where a document, image, or recording actually came from?',
-    options: [
-      { text: 'Yes — we use provenance, watermarking, or authentication standards for sensitive content', score: 4 },
-      { text: 'Partly — some content is verified, but there is no consistent method', score: 3 },
-      { text: 'No — but we recognise it is becoming a problem', score: 2 },
-      { text: 'No — and it has not come up as a concern', score: 1 },
-    ],
-  },
-  {
-    id: 't4', pillar: 'P2', col: 'p2_q4',
-    module: 'Tier 2 Day 2 — Defending identity verification and e-KYC processes',
-    frameworks: ['PDPA', 'CyberSecurity Malaysia'],
-    text: "Does your organisation verify a person's identity remotely — onboarding, e-KYC, account access, or approvals?",
-    options: [
-      { text: 'Yes — and our verification has been assessed specifically against synthetic identity and deepfake risk', score: 4 },
-      { text: 'Yes — and we have discussed the risk, but not formally assessed it', score: 3 },
-      { text: 'Yes — and we have not considered whether AI-generated identity could defeat it', score: 2 },
-      { text: 'I do not know how identity is verified in my organisation', score: 1 },
-    ],
-  },
-  {
-    id: 't5', pillar: 'P2', col: 'p2_q5',
+    id: 'c_t3', pillar: 'P2', col: 'p2_q3',
     module: 'Tier 1 · Pillar 2 — Real threats in Malaysia',
     frameworks: ['CyberSecurity Malaysia', 'NAIO'],
     text: 'How aware is your organisation of AI-enabled fraud already affecting Malaysian organisations?',
@@ -170,10 +116,8 @@ export const SAFETY_QUESTIONS = [
       { text: 'Not aware — this is not something we have discussed', score: 1 },
     ],
   },
-
-  /* ---------------- PILLAR 3 — RESILIENCE ---------------- */
   {
-    id: 'r1', pillar: 'P3', col: 'p3_q1',
+    id: 'c_r1', pillar: 'P3', col: 'p3_q1',
     module: "Tier 1 · Pillar 3 — AI-powered attacks and the risk of unmanaged 'shadow AI' at work",
     frameworks: ['AIGE', 'PDPA'],
     text: 'Do you know which AI tools your colleagues are using for work?',
@@ -185,7 +129,7 @@ export const SAFETY_QUESTIONS = [
     ],
   },
   {
-    id: 'r2', pillar: 'P3', col: 'p3_q2',
+    id: 'c_r2', pillar: 'P3', col: 'p3_q2',
     module: 'Tier 1 · Pillar 3 — Protecting data and privacy when using AI tools',
     frameworks: ['PDPA', 'ISO/IEC 42001'],
     text: 'Is there a clear rule about what information must never be entered into a public AI tool?',
@@ -197,7 +141,7 @@ export const SAFETY_QUESTIONS = [
     ],
   },
   {
-    id: 'r3', pillar: 'P3', col: 'p3_q3',
+    id: 'c_r3', pillar: 'P3', col: 'p3_q3',
     module: 'Tier 1 · Pillar 3 — Spotting, reporting, and responding to AI-related incidents',
     frameworks: ['CyberSecurity Malaysia', 'NIST AI RMF'],
     text: 'If an AI tool leaked confidential information or produced a harmful output, would you know what to do?',
@@ -208,33 +152,211 @@ export const SAFETY_QUESTIONS = [
       { text: 'I would probably not recognise it as an incident', score: 1 },
     ],
   },
-  {
-    id: 'r4', pillar: 'P3', col: 'p3_q4',
-    module: 'Tier 2 Day 3 — Building an AI incident-response process; recovery and continuity',
-    frameworks: ['NIST AI RMF', 'ISO/IEC 42001', 'CyberSecurity Malaysia'],
-    text: 'Does your organisation have a plan for responding to an AI-related security incident?',
-    options: [
-      { text: 'Yes — documented, owned, and tested or rehearsed', score: 4 },
-      { text: 'Yes — it exists on paper but has never been exercised', score: 3 },
-      { text: 'No — we would handle it under our general IT incident process', score: 2 },
-      { text: 'No — and I do not think anyone owns this', score: 1 },
-    ],
-  },
-  {
-    id: 'r5', pillar: 'P3', col: 'p3_q5',
-    module: 'Tier 2 Day 3 — Logging, monitoring, and anomaly detection; detecting abuse, drift, and leakage',
-    frameworks: ['NIST AI RMF', 'ISO/IEC 42001', 'OWASP LLM Top 10'],
-    text: 'Does your organisation monitor how AI systems are behaving once they are in use?',
-    options: [
-      { text: 'Yes — we log and monitor for abuse, drift, and data leakage', score: 4 },
-      { text: 'Partly — usage is logged but not actively monitored for problems', score: 3 },
-      { text: 'No — once a tool is deployed we assume it keeps working as expected', score: 2 },
-      { text: 'I do not know whether anything is monitored', score: 1 },
-    ],
-  },
 ]
 
-/* Routing question — NOT scored. Cluster (A-E) comes free from intake. */
+/* =============================================================
+   ROLE MODULES — 6 questions each, 2 per pillar.
+   A participant answers exactly one module.
+   ============================================================= */
+
+const MODULE_T1 = [
+  { id: 'm_s1', pillar: 'P1', col: 'p1_q4',
+    module: 'Tier 1 · Applied — Practical safe-use habits aligned to responsible-AI principles',
+    frameworks: ['AIGE'],
+    text: 'When you use AI for something that reaches a customer, colleague, or the public — do you check it first?',
+    options: [
+      { text: 'Always — I read every AI-assisted output before it goes anywhere', score: 4 },
+      { text: 'Usually — though I check less carefully when I am busy', score: 3 },
+      { text: 'Sometimes — mainly when the task feels important', score: 2 },
+      { text: 'Rarely — if it reads well, I send it', score: 1 },
+    ] },
+  { id: 'm_s2', pillar: 'P1', col: 'p1_q5',
+    module: "Tier 1 · Applied — Your organisation's AI acceptable-use basics",
+    frameworks: ['AIGE', 'PDPA'],
+    text: 'Do you know what your organisation permits and prohibits when using AI at work?',
+    options: [
+      { text: 'Yes — I have read the guidance and could explain it to a colleague', score: 4 },
+      { text: 'Broadly — I know the general expectations but not the detail', score: 3 },
+      { text: 'Not really — I follow my own judgement', score: 2 },
+      { text: 'No — I am not aware of any guidance', score: 1 },
+    ] },
+  { id: 'm_t1', pillar: 'P2', col: 'p2_q4',
+    module: 'Tier 1 · Pillar 2 — Verifying what you see and hear: simple verification habits',
+    frameworks: ['CyberSecurity Malaysia'],
+    text: 'Before forwarding a video, voice note, or document that seems surprising or urgent — what do you do?',
+    options: [
+      { text: 'Check the original source myself before passing it on', score: 4 },
+      { text: 'Usually pause and think about it, but do not always verify', score: 3 },
+      { text: 'Forward it and let others judge', score: 2 },
+      { text: 'I have not thought of this as something to check', score: 1 },
+    ] },
+  { id: 'm_t2', pillar: 'P2', col: 'p2_q5',
+    module: 'Tier 1 · Pillar 2 — Deepfakes, voice cloning, and synthetic identity',
+    frameworks: ['CyberSecurity Malaysia'],
+    text: 'If you suspected a message or call was AI-generated impersonation, would you know what to do next?',
+    options: [
+      { text: 'Yes — I would stop, verify separately, and report it to the right person', score: 4 },
+      { text: 'I would verify separately, but I am not sure who to report it to', score: 3 },
+      { text: 'I would probably just ignore it', score: 2 },
+      { text: 'I would not know how to tell in the first place', score: 1 },
+    ] },
+  { id: 'm_r1', pillar: 'P3', col: 'p3_q4',
+    module: 'Tier 1 · Pillar 3 — Protecting data and privacy when using AI tools',
+    frameworks: ['PDPA'],
+    text: 'Have you ever entered work information into a public AI tool without checking whether it was sensitive?',
+    options: [
+      { text: 'No — I check what I am entering every time', score: 4 },
+      { text: 'Possibly — I am usually careful but have not always checked', score: 3 },
+      { text: 'Yes — I have done it without thinking about it', score: 2 },
+      { text: 'I would not know what counts as sensitive', score: 1 },
+    ] },
+  { id: 'm_r2', pillar: 'P3', col: 'p3_q5',
+    module: 'Tier 1 · Pillar 3 — Spotting, reporting, and responding to AI-related incidents',
+    frameworks: ['CyberSecurity Malaysia'],
+    text: 'If a colleague told you an AI tool had done something harmful, how would you respond?',
+    options: [
+      { text: 'Report it through the proper channel and make sure it is recorded', score: 4 },
+      { text: 'Tell my manager and leave it with them', score: 3 },
+      { text: 'Suggest they stop using the tool and leave it there', score: 2 },
+      { text: 'I would not be sure it needed action', score: 1 },
+    ] },
+]
+
+const MODULE_T2 = [
+  { id: 'm_s1', pillar: 'P1', col: 'p1_q4',
+    module: 'Tier 2 Day 1 — AI red-teaming: adversarial prompting and jailbreak testing',
+    frameworks: ['NIST AI RMF', 'OWASP LLM Top 10'],
+    text: 'Has any AI system in your organisation been deliberately probed for unsafe, biased, or leaking behaviour?',
+    options: [
+      { text: 'Yes — structured red-teaming with documented findings and severity ratings', score: 4 },
+      { text: 'Yes — informal testing by individuals, not systematically recorded', score: 3 },
+      { text: 'No — we test that it works, not that it fails safely', score: 2 },
+      { text: 'No — and we would not know how to begin', score: 1 },
+    ] },
+  { id: 'm_s2', pillar: 'P1', col: 'p1_q5',
+    module: 'Tier 2 Day 1 — Guardrails, safe-by-design controls, and acceptance criteria',
+    frameworks: ['NIST AI RMF', 'ISO/IEC 42001'],
+    text: 'Do the AI systems you work on have input/output guardrails and defined human-escalation points?',
+    options: [
+      { text: 'Yes — guardrails, content filters, and escalation paths designed in by risk level', score: 4 },
+      { text: 'Partly — some filtering exists but escalation is not formally defined', score: 3 },
+      { text: 'No — we rely on vendor or model-provider defaults', score: 2 },
+      { text: 'No — and I am not sure what controls are in place', score: 1 },
+    ] },
+  { id: 'm_t1', pillar: 'P2', col: 'p2_q4',
+    module: 'Tier 2 Day 2 — Content provenance, watermarking, and authentication standards',
+    frameworks: ['AIGE', 'CyberSecurity Malaysia'],
+    text: 'Does your organisation implement provenance, watermarking, or authentication for content it produces or receives?',
+    options: [
+      { text: 'Yes — implemented and verified for sensitive content', score: 4 },
+      { text: 'In progress — an approach is selected but not yet deployed', score: 3 },
+      { text: 'No — discussed, but no technical action taken', score: 2 },
+      { text: 'No — this has not been raised as an engineering concern', score: 1 },
+    ] },
+  { id: 'm_t2', pillar: 'P2', col: 'p2_q5',
+    module: 'Tier 2 Day 2 — Defending identity verification and e-KYC processes',
+    frameworks: ['PDPA', 'CyberSecurity Malaysia'],
+    text: 'Have your identity verification or e-KYC processes been tested against synthetic identity and deepfake attacks?',
+    options: [
+      { text: 'Yes — tested specifically against synthetic media, with mitigations implemented', score: 4 },
+      { text: 'Assessed on paper but not actively tested', score: 3 },
+      { text: 'No — our verification predates this threat and has not been revisited', score: 2 },
+      { text: 'We do not perform remote identity verification, or I do not know', score: 1 },
+    ] },
+  { id: 'm_r1', pillar: 'P3', col: 'p3_q4',
+    module: 'Tier 2 Day 3 — Threat modelling for AI systems',
+    frameworks: ['NIST AI RMF', 'OWASP LLM Top 10'],
+    text: 'Has the attack surface of your AI-enabled services been mapped and prioritised?',
+    options: [
+      { text: 'Yes — threat modelled, risks prioritised, mitigations designed and tracked', score: 4 },
+      { text: 'Partly — risks identified but not systematically modelled', score: 3 },
+      { text: 'No — AI systems are covered by our general security process only', score: 2 },
+      { text: 'No — AI-specific threats are not part of our security work', score: 1 },
+    ] },
+  { id: 'm_r2', pillar: 'P3', col: 'p3_q5',
+    module: 'Tier 2 Day 3 — Monitoring, detection and response: abuse, drift, and data leakage',
+    frameworks: ['NIST AI RMF', 'ISO/IEC 42001', 'OWASP LLM Top 10'],
+    text: 'Are your AI systems monitored in production for abuse, drift, and data leakage?',
+    options: [
+      { text: 'Yes — logged and monitored, with anomaly detection and a defined response', score: 4 },
+      { text: 'Logged, but not actively monitored for AI-specific problems', score: 3 },
+      { text: 'No — we monitor availability and performance only', score: 2 },
+      { text: 'No — once deployed, we assume behaviour remains stable', score: 1 },
+    ] },
+]
+
+const MODULE_T3 = [
+  { id: 'm_s1', pillar: 'P1', col: 'p1_q4',
+    module: 'Tier 3 Day 1 — Risk-based AI governance: classifying use cases by risk and impact',
+    frameworks: ['AIGE', 'NIST AI RMF', 'ISO/IEC 42001'],
+    text: 'Are AI use cases in your organisation classified by risk, with controls matched to the level of risk?',
+    options: [
+      { text: 'Yes — a risk classification exists and determines the controls applied', score: 4 },
+      { text: 'Partly — higher-risk uses get more scrutiny, but not through a formal framework', score: 3 },
+      { text: 'No — all AI use is treated the same way', score: 2 },
+      { text: 'No — we do not have visibility of where AI is being used', score: 1 },
+    ] },
+  { id: 'm_s2', pillar: 'P1', col: 'p1_q5',
+    module: 'Tier 3 Day 2 — AI assurance: risk assessment, impact assessment, and audit',
+    frameworks: ['ISO/IEC 42001', 'NIST AI RMF'],
+    text: 'Could your organisation demonstrate — to an auditor or regulator — that its AI systems are being used safely?',
+    options: [
+      { text: 'Yes — documented assessments, evidence, and an audit trail exist', score: 4 },
+      { text: 'Partly — we could assemble evidence, but it is not maintained routinely', score: 3 },
+      { text: 'No — we could describe our practices but not evidence them', score: 2 },
+      { text: 'No — this has not been considered', score: 1 },
+    ] },
+  { id: 'm_t1', pillar: 'P2', col: 'p2_q4',
+    module: 'Tier 3 Day 2 — Embedding safety and trust requirements into policy',
+    frameworks: ['AIGE', 'PDPA'],
+    text: 'Does organisational policy address verification of identity and content in an era of synthetic media?',
+    options: [
+      { text: 'Yes — policy explicitly covers verification, provenance, and impersonation risk', score: 4 },
+      { text: 'Partly — policy exists but predates synthetic media as a threat', score: 3 },
+      { text: 'No — this is handled operationally, not by policy', score: 2 },
+      { text: 'No — it has not been raised at policy level', score: 1 },
+    ] },
+  { id: 'm_t2', pillar: 'P2', col: 'p2_q5',
+    module: 'Tier 3 Day 2 — Managing third-party and vendor AI risk',
+    frameworks: ['ISO/IEC 42001', 'PDPA'],
+    text: 'When you procure AI capability, is vendor safety, security, and data practice assessed before contracting?',
+    options: [
+      { text: 'Yes — formal due diligence, contractual obligations, and ongoing oversight', score: 4 },
+      { text: 'Yes at procurement, but with little ongoing oversight afterwards', score: 3 },
+      { text: 'Informally — we rely on vendor assurances and reputation', score: 2 },
+      { text: 'No — AI vendors are procured like any other software', score: 1 },
+    ] },
+  { id: 'm_r1', pillar: 'P3', col: 'p3_q4',
+    module: 'Tier 3 Day 1 — Roles, accountability, escalation, and decision rights',
+    frameworks: ['AIGE', 'ISO/IEC 42001'],
+    text: 'If an AI system caused material harm tomorrow, is it clear who in your organisation is accountable?',
+    options: [
+      { text: 'Yes — accountability, escalation, and decision rights are documented and understood', score: 4 },
+      { text: 'Broadly — people would work it out, but it is not written down', score: 3 },
+      { text: 'No — it would likely fall to IT by default', score: 2 },
+      { text: 'No — and this would become a serious problem in the moment', score: 1 },
+    ] },
+  { id: 'm_r2', pillar: 'P3', col: 'p3_q5',
+    module: 'Tier 3 Day 2 — Board and stakeholder reporting on AI risk and posture',
+    frameworks: ['ISO/IEC 42001', 'NIST AI RMF'],
+    text: 'Does your board or senior leadership receive regular reporting on AI risk and posture?',
+    options: [
+      { text: 'Yes — regular structured reporting against agreed measures', score: 4 },
+      { text: 'Occasionally — when something prompts it', score: 3 },
+      { text: 'No — AI is reported only within general technology updates', score: 2 },
+      { text: 'No — AI risk does not reach board level', score: 1 },
+    ] },
+]
+
+export const ROLE_MODULES = { 1: MODULE_T1, 2: MODULE_T2, 3: MODULE_T3 }
+
+export const MODULE_LABELS = {
+  1: 'Everyday practice',
+  2: 'Technical practice',
+  3: 'Governance practice',
+}
+
+/* Routing question — not scored. */
 export const GOVERNANCE_QUESTION = {
   id: 'gov',
   text: 'Do you hold any formal responsibility for how AI is approved, governed, or used in your organisation?',
@@ -246,7 +368,10 @@ export const GOVERNANCE_QUESTION = {
   ],
 }
 
-/* ---------------- CAPACITY BANDS ---------------- */
+/* =============================================================
+   BANDS / TIERS / ROUTING
+   ============================================================= */
+
 export const CAPACITY_BANDS = [
   { min: 75, max: 100, label: 'Resilient', color: '#22C55E',
     summary: 'Safety, trust, and resilience are governed, tested, and owned. The priority now is sustaining the capability and extending it across the wider organisation.' },
@@ -262,7 +387,6 @@ export function getCapacityBand(pct) {
   return CAPACITY_BANDS.find(b => pct >= b.min && pct <= b.max) || CAPACITY_BANDS[3]
 }
 
-/* ---------------- TIER ROUTING ---------------- */
 export const TIERS = {
   1: { number: 1, name: 'Awareness & Literacy', duration: '1 day', hours: 7,
        certification: 'Certified AI Aware', color: '#00ADA9',
@@ -278,11 +402,8 @@ export const TIERS = {
        focus: 'Govern and lead organisational AI safety, trust, and resilience' },
 }
 
-/* Cluster (A-E) already captured at intake — reused, no new question. */
 const CLUSTER_TIER = { A: 3, B: 1, C: 1, D: 2, E: 1 }
 
-/* Mirrors CLUSTER_NAMES in individualQuestions.js. Duplicated here so the
-   safety path has no dependency on the individual assessment's data file. */
 export const CLUSTER_NAMES = {
   A: 'Leaders & Strategy',
   B: 'Commercial & Client',
@@ -292,55 +413,57 @@ export const CLUSTER_NAMES = {
 }
 
 export function assignTier(cluster, governance) {
-  // Governance ownership overrides cluster — a risk or compliance lead
-  // may sit in any cluster but belongs in Tier 3.
   if (governance === 'owns') return 3
   return CLUSTER_TIER[cluster] || 1
 }
 
 /**
- * Explains WHY a tier was recommended, in the participant's own terms.
+ * Which role module a participant answers.
  *
- * Without this the report simply asserts a tier. A delegate who is told
- * "Tier 3" with no reasoning has no way to judge whether the instrument
- * understood them — and no answer when a colleague asks why they were
- * placed differently.
- *
- * Returns { basis, reason, override } where `basis` is the short
- * attribution line and `reason` is the full explanation.
+ * Must be resolvable BEFORE the questions render. Governance ownership
+ * is asked at the END of the survey, so the module comes from cluster
+ * alone. A governance owner sitting in a Tier 1 cluster therefore
+ * answers the Tier 1 module but is recommended Tier 3 — the report
+ * states that explicitly rather than leaving the mismatch unexplained.
  */
-export function explainTier(cluster, governance, tierNumber) {
+export function selectModule(cluster) {
+  return CLUSTER_TIER[cluster] || 1
+}
+
+export function explainTier(cluster, governance, tierNumber, moduleNumber) {
   const roleName = CLUSTER_NAMES[cluster] || 'your role'
-  const tier = TIERS[tierNumber]
   const override = governance === 'owns'
 
-  if (override) {
-    const wouldHaveBeen = CLUSTER_TIER[cluster] || 1
+  if (override && moduleNumber !== tierNumber) {
     return {
       basis: 'Based on your governance responsibility',
-      reason: wouldHaveBeen === 3
-        ? `You selected ${roleName}, and you hold formal responsibility for how AI is approved, governed, or used. Both point to Tier 3 — this is the tier written for the people who own AI decisions rather than execute them.`
-        : `You selected ${roleName}, which would normally indicate Tier ${wouldHaveBeen}. However, you also hold formal responsibility for how AI is approved, governed, or used in your organisation. Governance ownership takes precedence: if you are accountable for AI decisions, you need the governance curriculum regardless of which function you sit in.`,
+      reason: `You selected ${roleName}, and answered the ${String(MODULE_LABELS[moduleNumber]).toLowerCase()} questions written for that function. You also hold formal responsibility for how AI is approved, governed, or used. Governance ownership takes precedence: if you are accountable for AI decisions, you need the governance curriculum regardless of which function you sit in.`,
+      override: true,
+    }
+  }
+  if (override) {
+    return {
+      basis: 'Based on your role and governance responsibility',
+      reason: `You selected ${roleName} and hold formal responsibility for how AI is approved, governed, or used. Both point to Tier 3 — the tier written for the people who own AI decisions rather than execute them.`,
       override: true,
     }
   }
 
   const REASONS = {
-    A: `You selected ${roleName}. Tier 3 is written for decision-makers, governance officers, and policy and risk leads — people who set direction and carry accountability for AI adoption rather than operate the systems themselves.`,
-    D: `You selected ${roleName}. Tier 2 is written for IT, security, risk, data, and development professionals — the people who test, secure, and operate AI systems. It is the only tier with hands-on labs.`,
-    B: `You selected ${roleName}. Tier 1 gives every member of the organisation a working understanding of AI safety, digital trust, and resilience, and the practical habits to apply them daily. It assumes no prior AI experience.`,
-    C: `You selected ${roleName}. Tier 1 gives every member of the organisation a working understanding of AI safety, digital trust, and resilience, and the practical habits to apply them daily. It assumes no prior AI experience.`,
-    E: `You selected ${roleName}. Tier 1 gives every member of the organisation a working understanding of AI safety, digital trust, and resilience, and the practical habits to apply them daily. It assumes no prior AI experience.`,
+    A: `You selected ${roleName}, so you answered the governance-level questions — risk classification, assurance, accountability, and board reporting. Tier 3 is written for decision-makers, governance officers, and policy and risk leads.`,
+    D: `You selected ${roleName}, so you answered the technical questions — red-teaming, guardrails, threat modelling, and production monitoring. Tier 2 is written for IT, security, risk, data, and development professionals, and is the only tier with hands-on labs.`,
+    B: `You selected ${roleName}, so you answered the everyday-practice questions — verification habits, acceptable use, and incident reporting. Tier 1 gives every member of the organisation a working understanding of AI safety, digital trust, and resilience, and assumes no prior AI experience.`,
   }
+  REASONS.C = REASONS.B
+  REASONS.E = REASONS.B
 
   return {
     basis: `Based on your role: ${roleName}`,
-    reason: (REASONS[cluster] || REASONS.B).replace('Tier 3', `Tier ${tierNumber}`),
+    reason: REASONS[cluster] || REASONS.B,
     override: false,
   }
 }
 
-/* ---------------- WEAKEST-PILLAR FOCUS ---------------- */
 export const PILLAR_FOCUS = {
   P1: 'Output verification and human oversight',
   P2: 'Deepfake defence and identity verification',
@@ -353,56 +476,61 @@ export const PILLAR_FOCUS_DETAIL = {
   P3: 'Your weakest area is what happens when something goes wrong. Know which AI tools are in use, what must never be entered into them, and who to tell when an incident occurs.',
 }
 
-/* ---------------- SCORING ---------------- */
+/* =============================================================
+   ASSEMBLY + SCORING
+   ============================================================= */
 
-/**
- * @param {object} responses  { s1: <optionIndex>, ..., r5: <optionIndex> }
- * @param {string} cluster    'A'..'E' from intake
- * @param {string} governance value from GOVERNANCE_QUESTION
- */
+/** Full ordered question list for a cluster: 9 core then 6 role. */
+export function getQuestionsFor(cluster) {
+  return [...CORE_QUESTIONS, ...ROLE_MODULES[selectModule(cluster)]]
+}
+
 export function computeSafetyScores(responses = {}, cluster = 'A', governance = 'none') {
-  const pillarSums = { P1: 0, P2: 0, P3: 0 }
-  const pillarCounts = { P1: 0, P2: 0, P3: 0 }
-  const answers = {}
+  const moduleNumber = selectModule(cluster)
+  const roleQs = ROLE_MODULES[moduleNumber]
 
-  SAFETY_QUESTIONS.forEach(q => {
-    const idx = responses[q.id]
-    const score = q.options[idx]?.score ?? 1   // unanswered floors at 1
-    answers[q.col] = q.options[idx]?.text ?? null
-    pillarSums[q.pillar] += score
-    pillarCounts[q.pillar] += 1
+  const answers = {}
+  const coreSums = { P1: 0, P2: 0, P3: 0 }
+  const totalSums = { P1: 0, P2: 0, P3: 0 }
+
+  CORE_QUESTIONS.forEach(q => {
+    const o = q.options[responses[q.id]]
+    const sc = o?.score ?? 1
+    answers[q.col] = o?.text ?? null
+    coreSums[q.pillar] += sc
+    totalSums[q.pillar] += sc
+  })
+  roleQs.forEach(q => {
+    const o = q.options[responses[q.id]]
+    const sc = o?.score ?? 1
+    answers[q.col] = o?.text ?? null
+    totalSums[q.pillar] += sc
   })
 
-  // TRUE 0-100 normalisation. 5 questions x 1-4 -> sum 5-20.
-  const pct = (sum) => Math.round(((sum - 5) / 15) * 100)
+  const clamp = (v) => Math.max(0, Math.min(100, v))
+  const corePct  = (sum) => clamp(Math.round(((sum - 3) / 9) * 100))   // 3 qs
+  const totalPct = (sum) => clamp(Math.round(((sum - 5) / 15) * 100))  // 5 qs
 
   const pillarScores = SAFETY_PILLARS.map(p => ({
-    key: p.key,
-    name: p.name,
-    abbr: p.abbr,
-    color: p.color,
-    sum: pillarSums[p.key],
-    percentage: Math.max(0, Math.min(100, pct(pillarSums[p.key]))),
+    key: p.key, name: p.name, abbr: p.abbr, color: p.color,
+    sum: totalSums[p.key],
+    percentage: totalPct(totalSums[p.key]),
+    corePercentage: corePct(coreSums[p.key]),
   }))
 
   const overallPercentage = Math.round(
-    pillarScores.reduce((a, p) => a + p.percentage, 0) / pillarScores.length
-  )
+    pillarScores.reduce((a, p) => a + p.percentage, 0) / pillarScores.length)
+  const coreOverallPercentage = Math.round(
+    pillarScores.reduce((a, p) => a + p.corePercentage, 0) / pillarScores.length)
 
   const band = getCapacityBand(overallPercentage)
 
-  // weakest pillar drives the headline recommendation
   const weakest = pillarScores.reduce((lo, p) => (p.percentage < lo.percentage ? p : lo), pillarScores[0])
   const strongest = pillarScores.reduce((hi, p) => (p.percentage > hi.percentage ? p : hi), pillarScores[0])
-
-  // A flat profile has no meaningful "weakest" pillar. Without this the
-  // report told a 100%/100%/100% respondent that their weakest area was
-  // AI Safety and instructed them to start verifying outputs — advice
-  // that contradicts the Resilient band printed directly above it.
   const isFlat = strongest.percentage === weakest.percentage
 
   const tierNumber = assignTier(cluster, governance)
-  const tierExplanation = explainTier(cluster, governance, tierNumber)
+  const tx = explainTier(cluster, governance, tierNumber, moduleNumber)
 
   const urgency =
     overallPercentage < 25 ? 'Immediate' :
@@ -412,6 +540,7 @@ export function computeSafetyScores(responses = {}, cluster = 'A', governance = 
   return {
     pillarScores,
     overallPercentage,
+    coreOverallPercentage,        // cross-role comparable figure for the dashboard
     capacityLabel: band.label,
     capacityColor: band.color,
     capacitySummary: band.summary,
@@ -419,23 +548,22 @@ export function computeSafetyScores(responses = {}, cluster = 'A', governance = 
     weakestPillarName: isFlat ? null : weakest.name,
     strongestPillarName: isFlat ? null : strongest.name,
     isFlat,
-    // suppressed on a flat profile; reframed at the top band so the
-    // advice matches the score instead of contradicting it
     primaryFocus: isFlat ? null : PILLAR_FOCUS[weakest.key],
     primaryFocusDetail: isFlat ? null : PILLAR_FOCUS_DETAIL[weakest.key],
     tierNumber,
     tier: TIERS[tierNumber],
-    tierBasis: tierExplanation.basis,
-    tierReason: tierExplanation.reason,
-    tierOverride: tierExplanation.override,
-    clusterName: CLUSTER_NAMES[cluster] || null,
+    tierBasis: tx.basis,
+    tierReason: tx.reason,
+    tierOverride: tx.override,
     urgency,
+    moduleNumber,
+    moduleLabel: MODULE_LABELS[moduleNumber],
+    clusterName: CLUSTER_NAMES[cluster] || null,
     governance,
-    answers,   // { p1_q1: '<option text>', ... } ready for insert
+    answers,
   }
 }
 
-/* Distinct frameworks touched by the instrument — printed on the report. */
 export const ALL_FRAMEWORKS = [
   'National Guidelines on AI Governance & Ethics (AIGE)',
   'NAIO & AI Technology Action Plan 2026-2030',

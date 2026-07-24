@@ -3,24 +3,27 @@ import { useNavigate } from 'react-router-dom'
 import { useAssessment } from '../context/AssessmentContext'
 import {
   SAFETY_PILLARS,
-  SAFETY_QUESTIONS,
   GOVERNANCE_QUESTION,
+  getQuestionsFor,
   computeSafetyScores,
 } from '../data/safetyQuestions'
 import { supabase, SESSION_CODE } from '../lib/supabase'
 import Logo from '../components/Logo'
-
-// Questions grouped by pillar, in the order the pillars are defined
-const PILLAR_GROUPS = SAFETY_PILLARS.map(p => ({
-  ...p,
-  questions: SAFETY_QUESTIONS.filter(q => q.pillar === p.key),
-}))
 
 export default function SurveySafety() {
   const navigate = useNavigate()
   const { assessmentData } = useAssessment()
   const { intake } = assessmentData
   const cluster = intake.cluster || 'A'
+
+  // The participant's question set: 9 shared core + 6 for their function.
+  const questions = getQuestionsFor(cluster)
+
+  // Questions grouped by pillar, in the order the pillars are defined
+  const pillarGroups = SAFETY_PILLARS.map(p => ({
+    ...p,
+    questions: questions.filter(q => q.pillar === p.key),
+  }))
 
   // responses: { [questionId]: optionIndex }; governance: option value string
   const [responses, setResponses] = useState({})
@@ -32,8 +35,8 @@ export default function SurveySafety() {
     if (!intake.firstName) navigate('/')
   }, [intake.firstName, navigate])
 
-  const answeredCount = SAFETY_QUESTIONS.filter(q => responses[q.id] !== undefined).length
-  const totalCount = SAFETY_QUESTIONS.length
+  const answeredCount = questions.filter(q => responses[q.id] !== undefined).length
+  const totalCount = questions.length
   const allScoredAnswered = answeredCount === totalCount
   const allAnswered = allScoredAnswered && governance !== null
 
@@ -152,7 +155,7 @@ export default function SurveySafety() {
         )}
 
         {/* Pillar groups */}
-        {PILLAR_GROUPS.map((pillar, pi) => (
+        {pillarGroups.map((pillar, pi) => (
           <div key={pillar.key} className="mb-8">
             {/* Pillar header */}
             <div
@@ -160,7 +163,7 @@ export default function SurveySafety() {
               style={{ borderLeft: `4px solid ${pillar.color}` }}
             >
               <p className="text-xs font-bold uppercase tracking-wide mb-1" style={{ color: pillar.color }}>
-                Pillar {pi + 1} of {PILLAR_GROUPS.length}
+                Pillar {pi + 1} of {pillarGroups.length}
               </p>
               <h2 className="text-[#1B3A5C] font-bold text-xl mb-1">{pillar.name}</h2>
               <p className="text-gray-500 text-sm">{pillar.definition}</p>
