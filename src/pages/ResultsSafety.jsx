@@ -24,6 +24,10 @@ export default function ResultsSafety() {
     urgency,
     tier,
     tierNumber,
+    tierBasis,
+    tierReason,
+    tierOverride,
+    clusterName,
   } = scores
 
   const pcts = pillarScores.map(p => p.percentage)
@@ -68,7 +72,10 @@ export default function ResultsSafety() {
         {/* BLOCK 1 — HEADER */}
         <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
           <h1 className="text-[#1B3A5C] font-black text-2xl">Your AI Safety Capacity Report</h1>
-          <p className="text-gray-500 text-sm">{intake.firstName} from {intake.organisation}</p>
+          <p className="text-gray-500 text-sm">
+            {intake.firstName} from {intake.organisation}
+            {clusterName && <span className="text-gray-400"> · {clusterName}</span>}
+          </p>
           <p className="text-gray-400 text-xs">{new Date().toLocaleDateString()}</p>
         </div>
 
@@ -153,6 +160,29 @@ export default function ResultsSafety() {
           <p className="text-[#00ADA9] text-xs font-bold uppercase tracking-widest mb-3">
             Your Recommended Programme Tier
           </p>
+
+          {/* Why this tier — navy accent when governance responsibility
+              overrode the role, otherwise the tier's own colour. */}
+          <div
+            className="rounded-2xl p-5 border mb-3"
+            style={{
+              background: tierOverride ? '#EEF2F7' : '#F2F5F9',
+              borderColor: tierOverride ? '#1B3A5C' : tier.color,
+            }}
+          >
+            <p className="font-bold text-sm mb-1" style={{ color: tierOverride ? '#1B3A5C' : tier.color }}>
+              {tierBasis}
+            </p>
+            <p className="text-[#1B3A5C] text-sm leading-relaxed">{tierReason}</p>
+          </div>
+
+          <p className="text-gray-500 text-sm mb-4">
+            Your role determines <span className="font-semibold text-[#1B3A5C]">WHICH</span> tier.
+            Your score determines <span className="font-semibold text-[#1B3A5C]">HOW URGENTLY</span> you should
+            start — you scored {overallPercentage}%, placing you in the {capacityLabel} band, which is
+            a {String(urgency).toLowerCase()} priority.
+          </p>
+
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" style={{ borderTop: `4px solid ${tier.color}` }}>
             <div className="p-6">
               <div className="flex items-center gap-2 flex-wrap mb-3">

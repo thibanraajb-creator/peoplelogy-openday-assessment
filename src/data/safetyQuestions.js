@@ -281,11 +281,63 @@ export const TIERS = {
 /* Cluster (A-E) already captured at intake — reused, no new question. */
 const CLUSTER_TIER = { A: 3, B: 1, C: 1, D: 2, E: 1 }
 
+/* Mirrors CLUSTER_NAMES in individualQuestions.js. Duplicated here so the
+   safety path has no dependency on the individual assessment's data file. */
+export const CLUSTER_NAMES = {
+  A: 'Leaders & Strategy',
+  B: 'Commercial & Client',
+  C: 'Creative & Marketing',
+  D: 'Technical & Delivery',
+  E: 'L&D & People',
+}
+
 export function assignTier(cluster, governance) {
   // Governance ownership overrides cluster — a risk or compliance lead
   // may sit in any cluster but belongs in Tier 3.
   if (governance === 'owns') return 3
   return CLUSTER_TIER[cluster] || 1
+}
+
+/**
+ * Explains WHY a tier was recommended, in the participant's own terms.
+ *
+ * Without this the report simply asserts a tier. A delegate who is told
+ * "Tier 3" with no reasoning has no way to judge whether the instrument
+ * understood them — and no answer when a colleague asks why they were
+ * placed differently.
+ *
+ * Returns { basis, reason, override } where `basis` is the short
+ * attribution line and `reason` is the full explanation.
+ */
+export function explainTier(cluster, governance, tierNumber) {
+  const roleName = CLUSTER_NAMES[cluster] || 'your role'
+  const tier = TIERS[tierNumber]
+  const override = governance === 'owns'
+
+  if (override) {
+    const wouldHaveBeen = CLUSTER_TIER[cluster] || 1
+    return {
+      basis: 'Based on your governance responsibility',
+      reason: wouldHaveBeen === 3
+        ? `You selected ${roleName}, and you hold formal responsibility for how AI is approved, governed, or used. Both point to Tier 3 — this is the tier written for the people who own AI decisions rather than execute them.`
+        : `You selected ${roleName}, which would normally indicate Tier ${wouldHaveBeen}. However, you also hold formal responsibility for how AI is approved, governed, or used in your organisation. Governance ownership takes precedence: if you are accountable for AI decisions, you need the governance curriculum regardless of which function you sit in.`,
+      override: true,
+    }
+  }
+
+  const REASONS = {
+    A: `You selected ${roleName}. Tier 3 is written for decision-makers, governance officers, and policy and risk leads — people who set direction and carry accountability for AI adoption rather than operate the systems themselves.`,
+    D: `You selected ${roleName}. Tier 2 is written for IT, security, risk, data, and development professionals — the people who test, secure, and operate AI systems. It is the only tier with hands-on labs.`,
+    B: `You selected ${roleName}. Tier 1 gives every member of the organisation a working understanding of AI safety, digital trust, and resilience, and the practical habits to apply them daily. It assumes no prior AI experience.`,
+    C: `You selected ${roleName}. Tier 1 gives every member of the organisation a working understanding of AI safety, digital trust, and resilience, and the practical habits to apply them daily. It assumes no prior AI experience.`,
+    E: `You selected ${roleName}. Tier 1 gives every member of the organisation a working understanding of AI safety, digital trust, and resilience, and the practical habits to apply them daily. It assumes no prior AI experience.`,
+  }
+
+  return {
+    basis: `Based on your role: ${roleName}`,
+    reason: (REASONS[cluster] || REASONS.B).replace('Tier 3', `Tier ${tierNumber}`),
+    override: false,
+  }
 }
 
 /* ---------------- WEAKEST-PILLAR FOCUS ---------------- */
@@ -350,6 +402,7 @@ export function computeSafetyScores(responses = {}, cluster = 'A', governance = 
   const isFlat = strongest.percentage === weakest.percentage
 
   const tierNumber = assignTier(cluster, governance)
+  const tierExplanation = explainTier(cluster, governance, tierNumber)
 
   const urgency =
     overallPercentage < 25 ? 'Immediate' :
@@ -372,6 +425,10 @@ export function computeSafetyScores(responses = {}, cluster = 'A', governance = 
     primaryFocusDetail: isFlat ? null : PILLAR_FOCUS_DETAIL[weakest.key],
     tierNumber,
     tier: TIERS[tierNumber],
+    tierBasis: tierExplanation.basis,
+    tierReason: tierExplanation.reason,
+    tierOverride: tierExplanation.override,
+    clusterName: CLUSTER_NAMES[cluster] || null,
     urgency,
     governance,
     answers,   // { p1_q1: '<option text>', ... } ready for insert

@@ -117,10 +117,12 @@ export function buildSafetyReport(data) {
   })
 
   /* ---------- HEADER ---------- */
+  const metaBits = [sessionLabel, today].filter(Boolean)
   d.docHeader({
     title: 'AI Safety Capacity & Digital Trust',
-    subtitle: org ? `${name} from ${org}` : name,
-    meta: sessionLabel ? `${sessionLabel} · ${today}` : today,
+    subtitle: [org ? `${name} from ${org}` : name, scores.clusterName]
+      .filter(Boolean).join('  ·  '),
+    meta: metaBits.join(' · '),
   })
 
   /* ---------- HERO: capacity band ---------- */
@@ -191,8 +193,23 @@ export function buildSafetyReport(data) {
   const detail = TIER_DETAIL[tier.number] || TIER_DETAIL[1]
 
   d.sectionLabel('Your Recommended Programme Tier')
+
+  /* Show WHY this tier, in the participant's own terms. Asserting a tier
+     without the reasoning gives the reader no way to judge whether the
+     instrument understood them, and no answer when a colleague asks why
+     they were placed differently. */
+  d.calloutBox({
+    title: scores.tierBasis || 'Based on your role',
+    text: scores.tierReason ||
+      'Tier placement is determined by your role and governance responsibility, not by your score.',
+    accent: scores.tierOverride ? T.navy : tier.color,
+    tint: scores.tierOverride ? '#EEF2F7' : '#F2F5F9',
+  })
+
   d.paragraph(
-    'Tier placement is determined by your role and governance responsibility, not by your score. Your score determines how urgently you should start.',
+    'Your role determines WHICH tier. Your score determines HOW URGENTLY you should start — you scored ' +
+    scores.overallPercentage + '%, placing you in the ' + scores.capacityLabel +
+    ' band, which is a ' + String(scores.urgency).toLowerCase() + ' priority.',
     { size: 8.6 }
   )
 
@@ -220,6 +237,10 @@ export function buildSafetyReport(data) {
   /* ---------- FULL LADDER ---------- */
   d.space(1)
   d.sectionLabel('The Full Capability Ladder', T.navy)
+  d.paragraph(
+    'The tiers are stackable and may be taken independently. Your highlighted tier is the one written for your role — the others remain available to colleagues in those functions.',
+    { size: 8.2 }
+  )
   d.comparisonTable({
     highlight: [tier.number],
     countHeader: 'HOURS',
