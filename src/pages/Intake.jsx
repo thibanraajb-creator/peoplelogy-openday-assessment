@@ -231,7 +231,7 @@ export default function Intake() {
             </Field>
 
             {/* Email (optional) */}
-            <Field label="Email address (optional)" error={errors.email}>
+            <Field label="Email address" error={errors.email}>
               <input
                 id="email"
                 type="email"
