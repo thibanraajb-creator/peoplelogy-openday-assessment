@@ -75,6 +75,11 @@ export default function SurveySafety() {
       primary_focus:    scores.primaryFocus,
       recommended_tier: scores.tierNumber,
       urgency:          scores.urgency,
+      role_module:           scores.moduleNumber,
+      core_safety_score:     scores.pillarScores[0].corePercentage,
+      core_trust_score:      scores.pillarScores[1].corePercentage,
+      core_resilience_score: scores.pillarScores[2].corePercentage,
+      core_overall_score:    scores.coreOverallPercentage,
     }
 
     const { error } = await supabase

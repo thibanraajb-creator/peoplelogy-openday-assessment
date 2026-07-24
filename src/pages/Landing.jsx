@@ -447,6 +447,16 @@ export default function Landing() {
             >
               Facilitator Screen
             </a>
+            <span style={{ color: 'rgba(255,255,255,0.1)' }}>·</span>
+            <a
+              href="/dashboard/safety"
+              className="text-xs transition-colors"
+              style={{ color: 'rgba(255,255,255,0.2)' }}
+              onMouseEnter={e => e.currentTarget.style.color = 'rgba(255,255,255,0.5)'}
+              onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.2)'}
+            >
+              Safety Dashboard
+            </a>
           </div>
         </div>
       </footer>

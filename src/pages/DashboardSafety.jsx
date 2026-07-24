@@ -22,10 +22,15 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase, SESSION_CODE } from '../lib/supabase'
 
+/* Cross-cohort figures use the core_* columns only. The core 9 questions
+   are identical for everyone, so they are the only scores comparable
+   across role modules. The stored full-15 columns (safety_score,
+   overall_score, capacity_label, weakest_pillar, …) are correct for the
+   individual report but NOT for aggregation, so nothing here reads them. */
 const PILLARS = [
-  { key: 'safety_score',     name: 'AI Safety',     color: '#00ADA9' },
-  { key: 'trust_score',      name: 'Digital Trust', color: '#3B82F6' },
-  { key: 'resilience_score', name: 'Resilience',    color: '#7C3AED' },
+  { key: 'core_safety_score',     name: 'AI Safety',     color: '#00ADA9' },
+  { key: 'core_trust_score',      name: 'Digital Trust', color: '#3B82F6' },
+  { key: 'core_resilience_score', name: 'Resilience',    color: '#7C3AED' },
 ]
 
 const BANDS = [
@@ -34,6 +39,12 @@ const BANDS = [
   { label: 'Aware',     color: '#F97316' },
   { label: 'Exposed',   color: '#EF4444' },
 ]
+
+/* Band derived client-side from the core overall score, using the same
+   thresholds as the stored capacity_label — so the band distribution is
+   on the same comparable scale as every other panel. */
+const bandOf = (pct) =>
+  pct >= 75 ? 'Resilient' : pct >= 50 ? 'Managed' : pct >= 25 ? 'Aware' : 'Exposed'
 
 const CLUSTERS = {
   A: 'Leaders & Strategy',
@@ -47,6 +58,12 @@ const TIERS = {
   1: { name: 'Tier 1 — Awareness & Literacy',    color: '#00ADA9', duration: '1 day' },
   2: { name: 'Tier 2 — Practitioner',            color: '#3B82F6', duration: '3 days' },
   3: { name: 'Tier 3 — Governance & Leadership', color: '#7C3AED', duration: '2 days' },
+}
+
+const MODULES = {
+  1: { label: 'Everyday practice',   color: '#00ADA9' },
+  2: { label: 'Technical practice',  color: '#3B82F6' },
+  3: { label: 'Governance practice', color: '#7C3AED' },
 }
 
 const SMALL_SAMPLE = 20
@@ -152,16 +169,19 @@ export default function DashboardSafety() {
   const all = rows
   const n = all.length
 
-  /* ---------- aggregates ---------- */
+  /* ---------- aggregates (core_* only — comparable across modules) ---------- */
   const pillarAvgs = PILLARS.map(p => ({ ...p, value: avg(all, p.key) }))
-  const overall = avg(all, 'overall_score')
+  const overall = avg(all, 'core_overall_score')
 
   const weakest = pillarAvgs.reduce((lo, p) => (p.value < lo.value ? p : lo), pillarAvgs[0])
   const strongest = pillarAvgs.reduce((hi, p) => (p.value > hi.value ? p : hi), pillarAvgs[0])
   const spread = strongest.value - weakest.value
 
+  /* Band distribution derived from core_overall_score, not the stored
+     full-15 capacity_label — otherwise it would contradict the core-based
+     figures in every other panel. */
   const bandCounts = BANDS.map(b => {
-    const c = all.filter(r => r.capacity_label === b.label).length
+    const c = all.filter(r => bandOf(Number(r.core_overall_score) || 0) === b.label).length
     return { ...b, n: c, pct: n ? Math.round((c / n) * 100) : 0 }
   })
 
@@ -170,10 +190,10 @@ export default function DashboardSafety() {
       const sub = all.filter(r => r.cluster === k)
       return {
         key: k, name, n: sub.length,
-        safety: avg(sub, 'safety_score'),
-        trust: avg(sub, 'trust_score'),
-        resilience: avg(sub, 'resilience_score'),
-        overall: avg(sub, 'overall_score'),
+        safety: avg(sub, 'core_safety_score'),
+        trust: avg(sub, 'core_trust_score'),
+        resilience: avg(sub, 'core_resilience_score'),
+        overall: avg(sub, 'core_overall_score'),
       }
     })
     .filter(c => c.n > 0)
@@ -190,16 +210,24 @@ export default function DashboardSafety() {
   )
     .map(([name, sub]) => ({
       name, n: sub.length,
-      safety: avg(sub, 'safety_score'),
-      trust: avg(sub, 'trust_score'),
-      resilience: avg(sub, 'resilience_score'),
-      overall: avg(sub, 'overall_score'),
+      safety: avg(sub, 'core_safety_score'),
+      trust: avg(sub, 'core_trust_score'),
+      resilience: avg(sub, 'core_resilience_score'),
+      overall: avg(sub, 'core_overall_score'),
     }))
     .sort((a, b) => b.n - a.n || b.overall - a.overall)
 
   const tierCounts = [1, 2, 3].map(t => {
     const c = all.filter(r => Number(r.recommended_tier) === t).length
     return { tier: t, ...TIERS[t], n: c, pct: n ? Math.round((c / n) * 100) : 0 }
+  })
+
+  /* Which question set each participant answered (role_module). Distinct
+     from recommended tier: a governance owner in a Tier 1 cluster answers
+     the Tier 1 module but is recommended Tier 3. */
+  const moduleCounts = [1, 2, 3].map(m => {
+    const c = all.filter(r => Number(r.role_module) === m).length
+    return { module: m, ...MODULES[m], n: c, pct: n ? Math.round((c / n) * 100) : 0 }
   })
 
   if (loading) {
@@ -324,7 +352,7 @@ export default function DashboardSafety() {
               <span className="font-bold">{weakest.name}</span> is the weakest pillar at{' '}
               <span className="font-bold" style={{ color: weakest.color }}>{weakest.value}%</span>
               {' '}— <span className="font-bold">{spread} points</span> below {strongest.name}.
-              {weakest.key === 'trust_score' && (
+              {weakest.key === 'core_trust_score' && (
                 <span className="text-white/60">
                   {' '}Organisations are considering whether AI is <em>reliable</em>, and far
                   less whether what they see and hear is <em>real</em>. Deepfake-enabled fraud
@@ -336,8 +364,8 @@ export default function DashboardSafety() {
         )}
 
         {/* ---------- ROW 1 ---------- */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
-          <Panel title="Capacity distribution">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
+          <Panel title="Capacity distribution" subtitle="Core score band">
             {bandCounts.map(b => (
               <div key={b.label} className="mb-4 last:mb-0">
                 <div className="flex justify-between items-baseline mb-1.5">
@@ -348,6 +376,23 @@ export default function DashboardSafety() {
                   </span>
                 </div>
                 <Bar value={b.pct} color={b.color} />
+              </div>
+            ))}
+          </Panel>
+
+          <Panel title="By programme module" subtitle="Which question set each answered">
+            {moduleCounts.map(m => (
+              <div key={m.module} className="mb-4 last:mb-0">
+                <p className="text-sm font-semibold mb-1" style={{ color: m.color }}>
+                  {m.module} · {m.label}
+                </p>
+                <div className="flex items-baseline gap-2 mb-1.5">
+                  <span className="text-3xl font-bold leading-none">{m.n}</span>
+                  <span className="text-white/40 text-sm">
+                    {m.n === 1 ? 'person' : 'people'} · {m.pct}%
+                  </span>
+                </div>
+                <Bar value={m.pct} color={m.color} height="h-2" />
               </div>
             ))}
           </Panel>
@@ -391,16 +436,19 @@ export default function DashboardSafety() {
             Recent submissions
           </p>
           <div className="flex flex-wrap gap-2">
-            {all.slice(0, 20).map(r => (
-              <div key={r.id} className="bg-white/10 rounded-lg px-3 py-2 flex items-center gap-2.5">
-                <span className="text-sm font-medium">{r.first_name || 'Participant'}</span>
-                <span className="text-white/35 text-xs">{r.organisation}</span>
-                <span className="text-sm font-bold"
-                      style={{ color: BANDS.find(b => b.label === r.capacity_label)?.color || '#fff' }}>
-                  {r.overall_score}%
-                </span>
-              </div>
-            ))}
+            {all.slice(0, 20).map(r => {
+              const core = Number(r.core_overall_score) || 0
+              return (
+                <div key={r.id} className="bg-white/10 rounded-lg px-3 py-2 flex items-center gap-2.5">
+                  <span className="text-sm font-medium">{r.first_name || 'Participant'}</span>
+                  <span className="text-white/35 text-xs">{r.organisation}</span>
+                  <span className="text-sm font-bold"
+                        style={{ color: BANDS.find(b => b.label === bandOf(core))?.color || '#fff' }}>
+                    {core}%
+                  </span>
+                </div>
+              )
+            })}
           </div>
         </div>
 

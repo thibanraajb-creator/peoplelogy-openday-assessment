@@ -28,6 +28,7 @@ export default function ResultsSafety() {
     tierReason,
     tierOverride,
     clusterName,
+    moduleLabel,
   } = scores
 
   const pcts = pillarScores.map(p => p.percentage)
@@ -160,6 +161,12 @@ export default function ResultsSafety() {
           <p className="text-[#00ADA9] text-xs font-bold uppercase tracking-widest mb-3">
             Your Recommended Programme Tier
           </p>
+
+          {moduleLabel && (
+            <p className="text-gray-500 text-sm mb-3">
+              You answered the {String(moduleLabel).toLowerCase()} question set.
+            </p>
+          )}
 
           {/* Why this tier — navy accent when governance responsibility
               overrode the role, otherwise the tier's own colour. */}
