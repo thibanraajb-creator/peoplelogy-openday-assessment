@@ -430,28 +430,6 @@ export default function DashboardSafety() {
           </Panel>
         </div>
 
-        {/* ---------- RECENT ---------- */}
-        <div className="bg-[#00ADA9]/10 border border-[#00ADA9]/30 rounded-2xl p-5 mt-5">
-          <p className="text-[10px] font-bold tracking-widest text-[#00ADA9] uppercase mb-3">
-            Recent submissions
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {all.slice(0, 20).map(r => {
-              const core = Number(r.core_overall_score) || 0
-              return (
-                <div key={r.id} className="bg-white/10 rounded-lg px-3 py-2 flex items-center gap-2.5">
-                  <span className="text-sm font-medium">{r.first_name || 'Participant'}</span>
-                  <span className="text-white/35 text-xs">{r.organisation}</span>
-                  <span className="text-sm font-bold"
-                        style={{ color: BANDS.find(b => b.label === bandOf(core))?.color || '#fff' }}>
-                    {core}%
-                  </span>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
         {/* ---------- FOOTER ---------- */}
         <div className="flex flex-wrap justify-between items-center gap-2 mt-6 pt-4 border-t border-white/10">
           <p className="text-white/30 text-[11px]">
